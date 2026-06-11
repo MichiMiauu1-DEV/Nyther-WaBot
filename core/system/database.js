@@ -113,17 +113,17 @@ export const defChatUser = {
 
 export const defSets = {
   self: 0,
-  prefix: '[\"/\",\"!\",\".\",\"#\"]',
+  prefix: '["*"]',
   commandsejecut: 0,
   newsletter_id: '120363401404146384@newsletter',
-  nameid: 'ೃ࿔ ყµҡเ ωαɓσƭร - σƒƒเ૮เαℓ ૮ɦαɳɳεℓ .ೃ࿐',
+  nameid: 'NO HAY CANAL JAJSAKJSAKJSKA',
   type: 'Owner',
-  link: 'https://api.yuki-wabot.my.id',
-  banner: 'https://cdn.yuki-wabot.my.id/files/tCVD.jpeg',
-  icon: 'https://cdn.yuki-wabot.my.id/files/4U5V.jpeg',
-  currency: 'Yenes',
-  namebot: 'Yuki',
-  botname: 'Yuki Suou',
+  link: 'NO LO SE PAPI GRACIAAAAAAAAAAAAAAAAAAAAAAAA',
+  banner: 'https://cdn.adoolab.xyz/dl/446f4529.jpeg',
+  icon: 'https://cdn.adoolab.xyz/dl/7b6d70d1.jpeg',
+  currency: 'Monedas',
+  namebot: 'Caine',
+  botname: 'Caine',
   owner: ''
 };
 
@@ -189,14 +189,14 @@ export function initDB() {
       prefix TEXT DEFAULT '[\"/\",\"!\",\".\",\"#\"]',
       commandsejecut INTEGER DEFAULT 0,
       newsletter_id TEXT DEFAULT '120363401404146384@newsletter',
-      nameid TEXT DEFAULT 'ೃ࿔ ყµҡเ ωαɓσƭร - σƒƒเ૮เαℓ ૮ɦαɳɳεℓ .ೃ࿐',
+      nameid TEXT DEFAULT 'COÑO NO HAY CANAL JSKAJSKAJSKAJSKA',
       type TEXT DEFAULT 'Owner',
-      link TEXT DEFAULT 'https://api.yuki-wabot.my.id',
-      banner TEXT DEFAULT 'https://cdn.yuki-wabot.my.id/files/tCVD.jpeg',
-      icon TEXT DEFAULT 'https://cdn.yuki-wabot.my.id/files/4U5V.jpeg',
-      currency TEXT DEFAULT 'Yenes',
-      namebot TEXT DEFAULT 'Yuki',
-      botname TEXT DEFAULT 'Yuki Suou',
+      link TEXT DEFAULT 'NO LO SE PAPI GRACIAAAAAAAAAAAAAAAAAAAAAA',
+      banner TEXT DEFAULT 'https://cdn.adoolab.xyz/dl/446f4529.jpeg',
+      icon TEXT DEFAULT 'https://cdn.adoolab.xyz/dl/7b6d70d1.jpeg',
+      currency TEXT DEFAULT 'Monedas',
+      namebot TEXT DEFAULT 'Caine',
+      botname TEXT DEFAULT 'Caine',
       owner TEXT DEFAULT ''
     )`);
   db.exec(`CREATE TABLE IF NOT EXISTS characters (id TEXT PRIMARY KEY, data TEXT)`);
