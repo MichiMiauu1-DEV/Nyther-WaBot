@@ -38,6 +38,7 @@ export default async (sock, msg) => {
   const botBase = botJid.split('@')[0];
   const isBotAdmins = msg.isGroup ? adminSet.has(botBase) : false;
   const isAdmins = msg.isGroup ? adminSet.has(senderBase) : false;
+  const isModeration = chat?.moderation || false;
 
   Promise.allSettled((global.cmdsExecute ?? []).filter(p => p.type === 'all').map(p => p.fn({ msg, sock, groupMetadata, participants, isAdmins, isBotAdmins, isOwner, __dirname: p.dirname }).catch(e => console.error(chalk.gray(`[ ✿ ] Error all-plugin ${p.key}: ${e.message}`)))));
 
