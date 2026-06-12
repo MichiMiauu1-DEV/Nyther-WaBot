@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 global.owner = ['50376271661', '5351512309'];
 
-global.dev = "© ⍴᥆ᥕᥱrᥱძ ᑲᥡ ⁱᵃᵐ|𝔇ĕ𝐬†𝓻⊙γ𒆜";
+global.dev = "Powered by MichiMiauOFC";
 global.links = {
   api: 'Insertar api',
   channel: "Insertar canal",
