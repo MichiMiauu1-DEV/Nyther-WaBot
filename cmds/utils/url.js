@@ -20,7 +20,7 @@ export default {
       return msg.reply(
         `⚠️ *USO INCORRECTO*\n\n` +
         `✏️ Ejemplo:\n` +
-        `™url https://pin.it/xxxxx`
+        `*url https://pin.it/xxxxx`
       )
     }
 
