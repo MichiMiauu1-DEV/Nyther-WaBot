@@ -20,7 +20,7 @@ export default {
 `╭━━━〔 ⚠️ *USO INCORRECTO* 〕━━━⬣
 ┃ ✏️ *Ejemplo:*
 ┃
-┃ ™url https://pin.it/xxxxx
+┃ *url https://pin.it/xxxxx
 ┃
 ┃ 🔗 También acepta enlaces
 ┃ directos de Pinterest.
