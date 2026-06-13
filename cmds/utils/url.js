@@ -9,7 +9,6 @@ export default {
 
     let url = text || args.join(' ') || msg.body || ''
 
-    // Si el usuario escribió: ™url https://...
     if (url.includes(' ')) {
       url = url.split(/ +/).slice(1).join(' ')
     }
@@ -18,14 +17,26 @@ export default {
 
     if (!url || !/^https?:\/\//i.test(url)) {
       return msg.reply(
-        `⚠️ *USO INCORRECTO*\n\n` +
-        `✏️ Ejemplo:\n` +
-        `*url https://pin.it/xxxxx`
+`╭━━━〔 ⚠️ *USO INCORRECTO* 〕━━━⬣
+┃ ✏️ *Ejemplo:*
+┃
+┃ ™url https://pin.it/xxxxx
+┃
+┃ 🔗 También acepta enlaces
+┃ directos de Pinterest.
+╰━━━━━━━━━━━━━━━━⬣`
       )
     }
 
     try {
-      await msg.reply(`🔍 *Analizando enlace de Pinterest...*`)
+
+      await msg.reply(
+`╭━━━〔 📌 *PINTEREST URL* 〕━━━⬣
+┃ 🔍 Analizando enlace...
+┃ ⏳ Expandiendo URL
+┃ 🖼️ Buscando imagen HD
+╰━━━━━━━━━━━━━━━━⬣`
+      )
 
       const headers = {
         'User-Agent':
@@ -35,6 +46,94 @@ export default {
         'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
+      }
+
+      const response = await axios.get(url, {
+        headers,
+        maxRedirects: 10,
+        timeout: 20000,
+        validateStatus: () => true
+      })
+
+      if (response.status >= 400) {
+        return msg.reply(
+`╭━━━〔 🚫 *ERROR* 〕━━━⬣
+┃ No pude acceder al enlace.
+┃
+┃ Posibles causas:
+┃ • El enlace es inválido
+┃ • El Pin es privado
+┃ • Pinterest bloqueó la petición
+╰━━━━━━━━━━━━━━━━⬣`
+        )
+      }
+
+      const finalUrl =
+        response.request?.res?.responseUrl ||
+        response.request?._redirectable?._currentUrl ||
+        response.config?.url ||
+        url
+
+      const $ = cheerio.load(response.data)
+
+      let imageUrl =
+        $('meta[property="og:image"]').attr('content') ||
+        $('meta[name="twitter:image"]').attr('content') ||
+        $('link[rel="image_src"]').attr('href')
+
+      if (imageUrl) {
+        imageUrl = imageUrl.split('?')[0]
+        imageUrl = imageUrl.replace(/\/\d+x\//, '/736x/')
+      }
+
+      if (!imageUrl) {
+        return msg.reply(
+`╭━━━〔 ❌ *SIN RESULTADOS* 〕━━━⬣
+┃ No encontré una imagen
+┃ válida para este Pin.
+┃
+┃ 💡 Prueba con otro enlace.
+╰━━━━━━━━━━━━━━━━⬣`
+        )
+      }
+
+      await sock.sendMessage(
+        msg.chat,
+        {
+          text:
+`╭━━━〔 ✅ *PINTEREST URL* 〕━━━⬣
+┃ 🎉 *Enlace procesado*
+┃ correctamente.
+┃
+┃ 🖼️ *Imagen HD:*
+┃ ${imageUrl}
+┃
+┃ 🔗 *URL expandida:*
+┃ ${finalUrl}
+┃
+┃ ✨ Calidad optimizada
+┃ para descargas.
+╰━━━━━━━━━━━━━━━━⬣`
+        },
+        { quoted: msg }
+      )
+
+    } catch (e) {
+      console.error('[Pinterest URL Error]', e)
+
+      return msg.reply(
+`╭━━━〔 🚫 *ERROR* 〕━━━⬣
+┃ No pude procesar el enlace.
+┃
+┃ Posibles causas:
+┃ • Pinterest bloqueó la petición
+┃ • El enlace es inválido
+┃ • El servidor no respondió
+╰━━━━━━━━━━━━━━━━⬣`
+      )
+    }
+  }
+}        'Pragma': 'no-cache'
       }
 
       const response = await axios.get(url, {
