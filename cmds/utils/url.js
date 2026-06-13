@@ -2,39 +2,101 @@ import axios from 'axios'
 import * as cheerio from 'cheerio'
 
 export default {
-    command: ['url'],
-    category: 'tools',
+  command: ['url'],
+  category: 'tools',
 
-    run: async (client, m, { text }) => {
-        // Extrae la URL de forma segura si 'text' llega vacío desde el framework
-        let url = text || m.text || m.body || ''
-        
-        // Si el texto incluye el comando (ej: "™url https://..."), limpia el comando y se queda solo con el link
-        if (url.includes(' ')) {
-            url = url.split(/ +/).slice(1).join(' ')
-        }
+  run: async ({ msg, sock, text, args }) => {
 
-        // Limpieza de espacios
-        url = url.trim()
+    let url = text || args.join(' ') || msg.body || ''
 
-        // Validación de uso
-        if (!url || !url.startsWith('http')) {
-            return m.reply(`⚠️ *USO INCORRECTO*\n\n✏️ Ejemplo:\n™url https://pin.it/xxxxx`)
-        }
+    // Si el usuario escribió: ™url https://...
+    if (url.includes(' ')) {
+      url = url.split(/ +/).slice(1).join(' ')
+    }
 
-        try {
-            await m.reply(`🔍 *Analizando enlace de Pinterest...*`)
+    url = url.trim()
 
-            // Headers completos para simular un navegador real y evitar bloqueos de Pinterest
-            const headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
+    if (!url || !/^https?:\/\//i.test(url)) {
+      return msg.reply(
+        `⚠️ *USO INCORRECTO*\n\n` +
+        `✏️ Ejemplo:\n` +
+        `™url https://pin.it/xxxxx`
+      )
+    }
 
-            // Realiza la petición y sigue los redireccionamientos (pin.it -> pinterest.com)
+    try {
+      await msg.reply(`🔍 *Analizando enlace de Pinterest...*`)
+
+      const headers = {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept':
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+
+      const response = await axios.get(url, {
+        headers,
+        maxRedirects: 10,
+        timeout: 20000,
+        validateStatus: () => true
+      })
+
+      if (response.status >= 400) {
+        return msg.reply(
+          `❌ *ERROR*\n\nNo pude acceder al enlace de Pinterest.`
+        )
+      }
+
+      const finalUrl =
+        response.request?.res?.responseUrl ||
+        response.request?._redirectable?._currentUrl ||
+        response.config?.url ||
+        url
+
+      const $ = cheerio.load(response.data)
+
+      let imageUrl =
+        $('meta[property="og:image"]').attr('content') ||
+        $('meta[name="twitter:image"]').attr('content') ||
+        $('link[rel="image_src"]').attr('href')
+
+      if (imageUrl) {
+        imageUrl = imageUrl.split('?')[0]
+
+        // Mejorar calidad
+        imageUrl = imageUrl.replace(/\/\d+x\//, '/736x/')
+      }
+
+      if (!imageUrl) {
+        return msg.reply(
+          `❌ *No pude encontrar una imagen válida para este Pin.*`
+        )
+      }
+
+      await sock.sendMessage(
+        msg.chat,
+        {
+          text:
+            `✅ *URL ENCONTRADA*\n\n` +
+            `🖼️ *Imagen:*\n${imageUrl}\n\n` +
+            `🔗 *Link original expandido:*\n${finalUrl}`
+        },
+        { quoted: msg }
+      )
+
+    } catch (e) {
+      console.error('[URL Pinterest Error]', e)
+
+      return msg.reply(
+        `❌ *ERROR*\n\n` +
+        `No pude procesar ese enlace de Pinterest o Pinterest bloqueó la solicitud.`
+      )
+    }
+  }
+}            // Realiza la petición y sigue los redireccionamientos (pin.it -> pinterest.com)
             const response = await axios.get(url, {
                 headers,
                 maxRedirects: 10
