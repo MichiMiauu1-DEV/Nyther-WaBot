@@ -217,7 +217,7 @@ export default {
         let text =
 `╭━━━〔 ❌ INCORRECTO 〕━━━⬣
 
-💔 -5 puntos
+💔 -3 puntos
 📊 Wins: ${u.marvelWins}
 ╰━━━━━━━━━━━━━━━`;
 
