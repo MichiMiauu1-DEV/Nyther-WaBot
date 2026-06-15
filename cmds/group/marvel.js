@@ -130,7 +130,7 @@ export default {
       { q: "¿Quién es el padre de Tony Stark?", a: "Howard Stark", o: ["Howard Stark", "Nick Fury", "Pepper"] },
       { q: "¿Quién es el agente de S.H.I.E.L.D tuerto?", a: "Nick Fury", o: ["Nick Fury", "Coulson", "Shield Agent"] },
       { q: "¿Quién muere en Avengers Endgame usando la gema?", a: "Iron Man", o: ["Iron Man", "Thor", "Hulk"] },
-      { q: "¿Quién viaja en el tiempo con el guante?", a: "Hulk", o: ["Hulk", "Ant-Man", "Iron Man"] },
+      { q: "¿Quién viaja en el tiempo con el guante?", a: "Capitán América", o: ["Capitán América", "Ant-Man", "Iron Man"] },
 
       { q: "¿Quién es el dios del engaño?", a: "Loki", o: ["Loki", "Thor", "Odin"] },
       { q: "¿Quién es el villano principal de Infinity War?", a: "Thanos", o: ["Thanos", "Loki", "Ultron"] },
