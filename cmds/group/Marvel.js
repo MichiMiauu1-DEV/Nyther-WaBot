@@ -65,7 +65,7 @@ export default {
 
     // ❌ FALLA
     const onFail = () => {
-      u.marvelWins = Math.max(0, u.marvelWins - 5);
+      u.marvelWins = Math.max(0, u.marvelWins - 3);
     };
 
     // 🧠 AQUÍ VA TU LISTA DE 75 TRIVIAS
