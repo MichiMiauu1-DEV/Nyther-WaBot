@@ -185,14 +185,14 @@ export default {
 ╰━━━━━━━━━━━━━━━`;
 
         // FIX LOGRO (RESTORED + SAFE CHECK)
-        if (wins === 1 && !u.achievements.some(a => a.id === "flag_starter")) {
+        if (wins === 75 && !u.achievements.some(a => a.id === "flag_starter")) {
           if (!Array.isArray(u.achievements)) u.achievements = [];
 
           u.achievements.push({
             id: "flag_starter",
             name: "🌍 Explorador Global",
             emoji: "🏆",
-            description: "Ganar 1 partida de banderas"
+            description: "Ganar 75 partida de banderas"
           });
 
           text += `\n\n🏆 LOGRO DESBLOQUEADO`;
