@@ -157,7 +157,7 @@ export default {
       { q: "¿Quién es el hechicero del Sanctum?", a: "Doctor Strange", o: ["Doctor Strange", "Wong", "Mordo"] },
 
       { q: "¿Quién es el dios del trueno en Thor Ragnarok?", a: "Thor", o: ["Thor", "Hulk", "Loki"] },
-      { q: "¿Quién destruye Asgard?", a: "Hela", o: ["Hela", "Loki", "Surtur"] },
+      { q: "¿Quién destruye Asgard?", a: "Surtur", o: ["Hela", "Loki", "Surtur"] },
       { q: "¿Quién es el demonio de fuego gigante?", a: "Surtur", o: ["Surtur", "Hela", "Fenrir"] },
       { q: "¿Quién es el villano de WandaVision?", a: "Agatha Harkness", o: ["Agatha Harkness", "Wanda", "Vision"] },
       { q: "¿Quién es la hija de Magneto?", a: "Scarlet Witch", o: ["Scarlet Witch", "Quicksilver", "Mystique"] },
