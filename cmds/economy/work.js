@@ -4,33 +4,75 @@ export default {
   command: ['w', 'work', 'chambear', 'trabajar'],
   category: 'economy',
   description: 'Ganar coins en mis maravillosas aventuras.',
+
   run: async ({ msg, sock, usedPrefix, command, text }) => {
+
     const chat = db.getChat(msg.chat);
-    
+
     // Si la economía está apagada, ¡Caine lo anuncia!
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(
+`╭━━━〔 🎪 𝘿𝙄𝙂𝙄𝙏𝘼𝙇 𝘾𝙄𝙍𝘾𝙐𝙎 〕━━━⬣
+
+🚫 ¡RECHORCHOLIS! ECONOMÍA CERRADA
+
+📌 Este espectáculo no está activo en esta carpa
+
+💡 Actívalo con:
+» ${usedPrefix}economy on
+
+╰━━━━━━━━━━━━━━━`
+      );
     }
 
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     const settings = db.getSettings(botId);
     const monedas = settings.currency;
+
     db.setCreate('chat_users', [msg.chat, msg.sender], 'lastwork', 0);
     const user = db.getChatUser(msg.chat, msg.sender);
+
     const cooldown = 3 * 60 * 1000;
 
-    // Si la superestrella necesita descansar
     if (Date.now() < user.lastwork) {
       const tiempoRestante = formatTime(user.lastwork - Date.now());
-      return sock.reply(msg.chat, `《✧》 ¡ALTO AHÍ, PEQUEÑA SUPERESTRELLA! ¡Aún estás agotado de tu última y alucinante aventura!\n\nDebes descansar en tu habitación virtual por *${tiempoRestante}* antes de volver al escenario principal.`, msg);
+
+      return sock.reply(
+        msg.chat,
+`╭━━━〔 ⏳ 𝘾𝙊𝙊𝙇𝘿𝙊𝙒𝙉 〕━━━⬣
+
+🎭 ¡ALTO AHÍ, ESTRELLA DIGITAL!
+
+⏱️ Aún estás recuperándote del show anterior
+
+📌 Tiempo restante:
+➜ ${tiempoRestante}
+
+╰━━━━━━━━━━━━━━━`,
+        msg
+      );
     }
 
     const rsl = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
+
     db.setChatUser(msg.chat, msg.sender, 'lastwork', Date.now() + cooldown);
-    db.setChatUser(msg.chat, msg.sender, 'coins', (user.coins || 0) + rsl);    
+    db.setChatUser(msg.chat, msg.sender, 'coins', (user.coins || 0) + rsl);
 
     // ¡El pago por la proeza en el circo!
-    await sock.sendMessage(msg.chat, { text: `《✧》 ${pickRandom(trabajo)} ¡Has recolectado la fabulosa suma de *${rsl.toLocaleString()} ${monedas}*!` }, { quoted: msg });
+    await sock.sendMessage(msg.chat, {
+      text:
+`╭━━━〔 🎪 𝙒𝙊𝙍𝙆 𝙎𝙃𝙊𝙒 〕━━━⬣
+
+✨ ${pickRandom(trabajo)}
+
+💰 Recompensa:
+➜ +${rsl.toLocaleString()} ${monedas}
+
+🎭 El Circo Digital te observa...
+
+╰━━━━━━━━━━━━━━━`
+    }, { quoted: msg });
+
   }
 };
 
