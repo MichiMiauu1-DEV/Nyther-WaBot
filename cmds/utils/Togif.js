@@ -14,7 +14,7 @@ export default {
         text:
 `╭━━━〔 ⚠️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
 
-📌 Debes responder a un sticker animado
+📌 Responde a un sticker animado
 
 ╰━━━━━━━━━━━━━━━`
       }, { quoted: msg });
@@ -38,7 +38,27 @@ export default {
         }, { quoted: msg });
       }
 
-      // 📡 ENVIAR A API
+      // 🔍 detectar animación (simple check webp)
+      const isAnimated =
+        buffer.toString('hex').includes('21f9') || // GIF header
+        buffer.length > 100000; // heurística
+
+      if (!isAnimated) {
+        await msg.react('⚠️');
+
+        return sock.sendMessage(chat, {
+          text:
+`╭━━━〔 ⚠️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
+
+📌 Este sticker NO es animado
+
+🎞️ Usa un sticker con movimiento
+
+╰━━━━━━━━━━━━━━━`
+        }, { quoted: msg });
+      }
+
+      // 📡 API CONVERT
       const res = await axios.post(
         'https://api.vreden.web.id/api/webp-to-gif',
         {
@@ -49,17 +69,17 @@ export default {
       const gifUrl = res.data?.result;
 
       if (!gifUrl) {
+        await msg.react('❌');
         return sock.sendMessage(chat, {
           text:
 `╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
 
-🚫 No se pudo convertir a GIF
+🚫 La API no pudo convertir el sticker
 
 ╰━━━━━━━━━━━━━━━`
         }, { quoted: msg });
       }
 
-      // 📤 enviar GIF
       await sock.sendMessage(chat, {
         video: { url: gifUrl },
         gifPlayback: true,
@@ -82,7 +102,7 @@ export default {
         text:
 `╭━━━〔 🚫 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
 
-⚠️ No se pudo procesar el sticker
+⚠️ Error inesperado al procesar
 
 ╰━━━━━━━━━━━━━━━`
       }, { quoted: msg });
