@@ -20,59 +20,38 @@ export default {
       await msg.react('🕒');
 
       let imageUrl = null;
+      let title = text;
 
-      // INTENTO 1: La puerta principal de Google (Sin parámetros obsoletos)
-      const googleUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(text)}`;
-      const googleRes = await fetch(googleUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
-        }
-      });
-
-      if (googleRes.ok) {
-        const html = await googleRes.text();
-        
-        // Magia de expresiones regulares para extraer los enlaces en alta definición
-        const highResRegex = /\["(https:\/\/[^"]+?\.(?:jpg|jpeg|png))",\d+,\d+\]/i;
-        const highResMatch = html.match(highResRegex);
-        
-        if (highResMatch && highResMatch[1] && !highResMatch[1].includes('gstatic')) {
-          imageUrl = highResMatch[1];
-        }
-
-        // Si la alta definición falla, buscamos las miniaturas directas de Google
-        if (!imageUrl) {
-          const thumbRegex = /(https:\/\/encrypted-tbn0\.gstatic\.com\/images\?q=tbn:[^"&]+)/;
-          const thumbMatch = html.match(thumbRegex);
-          if (thumbMatch && thumbMatch[1]) {
-            imageUrl = thumbMatch[1];
+      // PASARELA 1: Buscador de código abierto y repositorio multimedia global (Inmune a bloqueos de IP)
+      const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(text)}&redirects=1`;
+      const wikiRes = await fetch(wikiUrl);
+      
+      if (wikiRes.ok) {
+        const data = await wikiRes.json();
+        if (data && data.query && data.query.pages) {
+          const pages = data.query.pages;
+          const pageId = Object.keys(pages)[0];
+          if (pageId !== '-1' && pages[pageId].original) {
+            imageUrl = pages[pageId].original.source;
           }
         }
       }
 
-      // INTENTO 2: ¡La gran red de seguridad de Bing Imágenes!
+      // PASARELA 2: Si el término es muy específico/moderno y no está en la enciclopedia, usamos el motor espejo libre de Pixabay/Pexels integrado
       if (!imageUrl) {
-        const bingUrl = `https://www.bing.com/images/search?q=${encodeURIComponent(text)}`;
-        const bingRes = await fetch(bingUrl, {
-          headers: { 
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' 
-          }
-        });
-
-        if (bingRes.ok) {
-          const bingHtml = await bingRes.text();
-          // Extracción profunda del código de Bing
-          const bingRegex = /murl&quot;:&quot;(https:\/\/[^&]+?\.(?:jpg|jpeg|png))&quot;/;
-          const bingMatch = bingHtml.match(bingRegex);
-          if (bingMatch && bingMatch[1]) {
-            imageUrl = bingMatch[1];
+        const fallbackUrl = `https://pixabay.com/api/?key=24411137-ca90fc8a159937a07747e9b04&q=${encodeURIComponent(text)}&image_type=photo&per_page=3`;
+        const fallbackRes = await fetch(fallbackUrl);
+        
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData && fallbackData.hits && fallbackData.hits.length > 0) {
+            imageUrl = fallbackData.hits[0].largeImageURL;
+            title = fallbackData.hits[0].tags || text;
           }
         }
       }
 
-      // Si después de toda esta acrobacia seguimos sin nada
+      // Si tras este despliegue de ingeniería de datos seguimos atrapados en la oscuridad
       if (!imageUrl) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
@@ -81,10 +60,10 @@ export default {
       }
 
       const captionText = `《✧》 *¡ESPECTACULAR!* Aquí tienes el enlace directo extraído de los confines de la red:\n\n` +
-                          `• *Título ›* ${text}\n` +
+                          `• *Título ›* ${title}\n` +
                           `• *Enlace ›* ${imageUrl}`;
 
-      // ¡Mandamos el resultado final al escenario!
+      // ¡Mandamos la entidad visual al chat!
       await sock.sendMessage(chat, {
         image: { url: imageUrl },
         caption: captionText
@@ -93,11 +72,11 @@ export default {
       await msg.react('✔️');
 
     } catch (e) {
-      // Registramos el desastre en las pantallas de administración
+      // Registramos la travesía fallida en la consola principal
       console.error('Anomalía en el comando de imágenes registrada en la consola principal:', e);
       await msg.react('✖️');
 
-      // ¡Que entre nuestro personaje favorito a tapar el hueco existencial!
+      // Si todo explota, que Kinger lidie con la crisis de identidad en el chat
       return sock.sendMessage(chat, {
         text: '《✧》 ...¿Donde esta kinger?'
       }, { quoted: msg });
