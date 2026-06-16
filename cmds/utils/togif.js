@@ -39,9 +39,18 @@ export default {
 
       fs.writeFileSync(webpPath, buffer);
 
-      const ffmpegPath = process.env.FFMPEG_PATH || 'ffmpeg';
+      // LÓGICA DE SALVACIÓN: Si no hay variable, intentamos requerir el binario estático local
+      let ffmpegPath = process.env.FFMPEG_PATH;
+      if (!ffmpegPath) {
+        try {
+          const ffmpegStatic = await import('ffmpeg-static');
+          ffmpegPath = ffmpegStatic.default || ffmpegStatic;
+        } catch {
+          ffmpegPath = 'ffmpeg'; // Caída libre al global si nada funciona
+        }
+      }
 
-      // CONVERTIR CON FFMPEG
+      // CONVERTIR CON FFMPEG USANDO NUESTRO BINARIO INMUNE
       await new Promise((resolve, reject) => {
         exec(`"${ffmpegPath}" -i ${webpPath} -vf "fps=15,scale=512:-1:flags=lanczos" ${gifPath}`, (err) => {
           if (err) reject(err);
@@ -67,11 +76,11 @@ export default {
       await msg.react('✔️');
 
     } catch (e) {
-      // El error real se manda directo a la consola del servidor sin dejar rastro en el chat
+      // Registramos el error en la consola
       console.error('Anomalía en el comando togif registrada en la consola principal:', e);
       await msg.react('✖️');
 
-      // Respuesta desorientada en el chat ante el fallo catastrófico
+      // Desorientación total en el chat
       return sock.sendMessage(chat, {
         text: '《✧》 ...¿Donde esta kinger?'
       }, { quoted: msg });
