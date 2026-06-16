@@ -22,11 +22,22 @@ export default {
       let i = 15;
       let f = { exports: {} };
       
-      // Ejecutamos el código directamente dentro del constructor asíncrono
-      // Esto permite que las expresiones simples o los awaits devuelvan su valor de forma natural
+      // LÓGICA DE EVAL REAL: Si el código no incluye un 'return' explícito, no es un bloque de llaves,
+      // y es una expresión simple, le agregamos el 'return' automáticamente para capturar su valor.
+      let readyCode = code.trim();
+      if (!readyCode.includes('return') && !readyCode.includes(';') && !readyCode.startsWith('{')) {
+        readyCode = `return (${readyCode})`;
+      } else {
+        readyCode = code;
+      }
+
       let exec = new (async () => {}).constructor(
         'print', 'msg', 'sock', 'require', 'Array', 'process', 'args', 'module', 'exports', 'argument',
-        `return (async () => { ${code} })()`
+        `try {
+          ${readyCode}
+        } catch (e) {
+          throw e;
+        }`
       );
       
       _return = await exec.call(
@@ -49,7 +60,7 @@ export default {
       _return = e;
       await msg.react('✖️');
     } finally {
-      // Enviamos la respuesta SÍ O SÍ, mostrando "undefined" si no retornó ningún valor
+      // Te envía el resultado formateado sí o sí
       await sock.reply(msg.chat, _syntax + format(_return), msg);
     }
   }
