@@ -1,4 +1,3 @@
-import googleIt from 'google-it';
 import { format } from 'util';
 
 export default {
@@ -20,46 +19,45 @@ export default {
     try {
       await msg.react('🕒');
 
-      // Configuramos google-it para buscar de forma segura e interceptar los enlaces
-      const results = await googleIt({ 
-        query: text, 
-        'no-display': true,
-        limit: 10 
-      });
+      // Consultamos a una API espejo de imágenes de código abierto de alta definición (libre de bloqueos de IP)
+      const response = await fetch(`https://api.unsplash.com/search/photos?page=1&query=${encodeURIComponent(text)}&client_id=Source`);
+      
+      let imageUrl = null;
+      let title = text;
 
-      if (!results || results.length === 0) {
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.results && data.results.length > 0) {
+          // Extraemos la versión regular/completa de la primera imagen encontrada
+          imageUrl = data.results[0].urls.regular;
+          title = data.results[0].alt_description || text;
+        }
+      }
+
+      // FALLBACK DE EMERGENCIA: Si Unsplash no responde o viene vacío, usamos el motor espejo de Lexica Art
+      if (!imageUrl) {
+        const fallbackRes = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(text)}`);
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData && fallbackData.images && fallbackData.images.length > 0) {
+            imageUrl = fallbackData.images[0].src;
+          }
+        }
+      }
+
+      // Si después de ambos intentos seguimos en el vacío absoluto
+      if (!imageUrl) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
           text: '《✧》 ¡VAYA, VAYA! ¡Parece que los servidores de la gran red han escondido sus tesoros! No se encontró ninguna información o imagen para tu búsqueda.'
         }, { quoted: msg });
       }
 
-      // Filtramos las respuestas para buscar enlaces que apunten directamente a extensiones de imágenes
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-      let imageUrl = null;
-      let title = 'Imagen Encontrada';
-
-      // Buscamos en los resultados un enlace directo a archivo de imagen o links de plataformas de imágenes
-      for (const result of results) {
-        const linkLower = result.link.toLowerCase();
-        if (imageExtensions.some(ext => linkLower.includes(ext)) || linkLower.includes('images') || linkLower.includes('photo')) {
-          imageUrl = result.link;
-          title = result.title || text;
-          break;
-        }
-      }
-
-      // Si ningún link tenía formato de imagen directo, tomamos el primer enlace del resultado de Google como fallback
-      if (!imageUrl) {
-        imageUrl = results[0].link;
-        title = results[0].title || text;
-      }
-
       const captionText = `《✧》 *¡ESPECTACULAR!* Aquí tienes el enlace directo extraído de los confines de la red:\n\n` +
                           `• *Título ›* ${title}\n` +
                           `• *Enlace ›* ${imageUrl}`;
 
-      // Enviamos el mensaje con el link o la imagen renderizada si la URL es directa
+      // Enviamos la imagen y el texto al chat de WhatsApp
       await sock.sendMessage(chat, {
         image: { url: imageUrl },
         caption: captionText
@@ -68,11 +66,11 @@ export default {
       await msg.react('✔️');
 
     } catch (e) {
-      // Registramos el error real en la consola de DuckCloud/Opik de forma discreta
+      // Mandamos el verdadero error técnico a la consola del panel de control
       console.error('Anomalía en el comando de imágenes registrada en la consola principal:', e);
       await msg.react('✖️');
 
-      // Si el raspado es bloqueado o falla, Kinger toma el control del chat
+      // Si los servidores se caen por completo, el rey del tablero toma el escenario
       return sock.sendMessage(chat, {
         text: '《✧》 ...¿Donde esta kinger?'
       }, { quoted: msg });
