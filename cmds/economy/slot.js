@@ -5,97 +5,144 @@ export default {
   command: ['slot'],
   category: 'economy',
   description: 'Probar tu suerte en la caótica máquina tragamonedas de Caine.',
+
   run: async ({ msg, sock, args, usedPrefix, command, text }) => {
     const chat = db.getChat(msg.chat);
-    
-    // Si la economía está apagada en este sector virtual
+
+    // ╭━━━〔 🎪 𝙎𝙄𝙎𝙏𝙀𝙈𝘼 𝘿𝙀 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 〕━━━⬣
+    // ⚠️ Estado del Circo Digital
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+🎪 ¡RECHORCHOLIS! La economía del Circo Digital ha sido cerrada temporalmente en esta carpa virtual.
+
+📢 Pídele a un administrador que reactive el sistema con:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
 
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     const bot = db.getSettings(botId);
-    const currency = bot.currency;    
+    const currency = bot.currency;
+
     db.setCreate('chat_users', [msg.chat, msg.sender], 'lastslot', 0);
-    const user = db.getChatUser(msg.chat, msg.sender);    
+    const user = db.getChatUser(msg.chat, msg.sender);
 
     if (!args[0] || isNaN(args[0]) || parseInt(args[0]) <= 0) {
-      return msg.reply(`《✧》 ¡ALTO AHÍ! Para hacer girar los rodillos de la fortuna debes ingresar una cantidad matemática válida de *${currency}* para tu apuesta.\n\n> Ejemplo » *${usedPrefix + command} 500*`);
-    }    
+      return msg.reply(`╭━━━〔 🎰 𝙎𝙇𝙊𝙏 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
+
+⚠️ Debes ingresar una apuesta válida de *${currency}*
+
+📌 Ejemplo:
+➜ *${usedPrefix + command} 500*
+
+╰━━━━━━━━━━━━━━━`);
+    }
 
     const apuesta = parseInt(args[0]);
 
-    // Verificación del temporizador del WackyWatch
+    // ╭━━━〔 ⏳ 𝙒𝘼𝙄𝙏 𝙏𝙄𝙈𝙀𝙍 〕━━━⬣
+    // Control del cooldown
     if (Date.now() - user.lastslot < 30000) {
       const restante = user.lastslot + 30000 - Date.now();
-      return msg.reply(`《✧》 ¡MÁS DESPACIO, ENTUSIASTA DEL AZAR! La palanca mecánica está recuperando su energía digital. Debes esperar *${formatTime(restante)}* antes de tentar a la suerte otra vez.`);
-    }    
+
+      return msg.reply(`╭━━━〔 ⏳ 𝙀𝙎𝙋𝙀𝙍𝘼 𝘿𝙀 𝙇𝘼 𝙈𝘼𝙌𝙐𝙄𝙉𝘼 〕━━━⬣
+
+🎡 La tragamonedas aún se está reiniciando...
+
+⏱️ Tiempo restante:
+➜ *${formatTime(restante)}*
+
+╰━━━━━━━━━━━━━━━`);
+    }
 
     if (apuesta < 100) {
-      return msg.reply(`《✧》 ¡FONDOS INSUFICIENTES PARA LA FUNCIÓN! El requisito mínimo para activar los rodillos es de *¥100 ${currency}*.`);
+      return msg.reply(`╭━━━〔 ⚠️ 𝙈𝙄𝙉𝙄𝙈𝙊 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
+
+💰 Apuesta mínima: *¥100 ${currency}*
+
+╰━━━━━━━━━━━━━━━`);
     }
 
     if (user.coins < apuesta) {
-      return msg.reply(`《✧》 ¡CATASTRÓFICO ERROR FINANCIERO! No posees suficientes *${currency}* sueltas en tus bolsillos para cubrir esa arriesgada apuesta. ¡Prueba retirando fondos de tu Bóveda!`);
-    }    
+      return msg.reply(`╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
 
-    // Emojis temáticos del Circo Digital: Caine (👁️), Jax (🐰), Pomni (🎪)
+⚠️ No tienes suficientes *${currency}* para apostar.
+
+╰━━━━━━━━━━━━━━━`);
+    }
+
+    // Emojis
     const emojis = ['👁️', '🐰', '🎪'];
+
     const getRandomEmojis = () => {
       const x = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
       const y = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
       const z = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
       return { x, y, z };
-    };    
+    };
 
-    const initialText = '《✧》| *WACKY SLOTS* \n────────────────\n¡Girando los rodillos de la carpa!...';
+    const initialText =
+`╭━━━〔 🎰 𝙒𝘼𝘾𝙆𝙔 𝙎𝙇𝙊𝙏𝙎 〕━━━⬣
+
+🎪 ¡Girando los rodillos del Circo Digital...
+
+╰━━━━━━━━━━━━━━━`;
+
     let { key } = await sock.sendMessage(msg.chat, { text: initialText }, { quoted: msg });
 
-    // ¡ANIMACIÓN ESPECTACULAR EN TIEMPO REAL!
     const animateSlots = async () => {
       for (let i = 0; i < 5; i++) {
         const { x, y, z } = getRandomEmojis();
-        const animationText = `《✧》| *WACKY SLOTS* 
-────────────────
+
+        const animationText =
+`╭━━━〔 🎰 𝙒𝘼𝘾𝙆𝙔 𝙎𝙇𝙊𝙏𝙎 〕━━━⬣
+
    ${x[0]}  :  ${y[0]}  :  ${z[0]}
    ${x[1]}  :  ${y[1]}  :  ${z[1]}
    ${x[2]}  :  ${y[2]}  :  ${z[2]}
-────────────────
-¡Girando a máxima velocidad! 🎡`;
+
+🎡 Girando...
+
+╰━━━━━━━━━━━━━━━`;
+
         await sock.sendMessage(msg.chat, { text: animationText, edit: key }, { quoted: msg });
         await delay(300);
       }
     };
 
-    await animateSlots();    
+    await animateSlots();
 
-    // RESULTADO FINAL
     const { x, y, z } = getRandomEmojis();
-    let resultado;
-    let newCoins = user.coins;    
 
-    // Si los tres primeros rodillos de la fila superior coinciden (Línea ganadora)
+    let resultado;
+    let newCoins = user.coins;
+
     if (x[0] === y[0] && y[0] === z[0]) {
-      resultado = `🎉 *¡PREMIO ABSOLUTAMENTE ESPECTACULAR!* Los astros digitales se alinearon y has ganado *¥${(apuesta * 2).toLocaleString()} ${currency}*!`;
+      resultado = `🎉 ¡JACKPOT DEL CIRCO! Has ganado *¥${(apuesta * 2).toLocaleString()} ${currency}*!`;
       newCoins += apuesta;
     } else if (x[0] === y[0] || x[0] === z[0] || y[0] === z[0]) {
-      resultado = `🎭 *¡CASI LO LOGRAS!* Hubo una pequeña coincidencia en la carpa. ¡Toma un premio de consolación de *¥10 ${currency}* por tu grandioso intento!`;
+      resultado = `🎭 ¡CASI LO LOGRAS! Premio pequeño: *¥10 ${currency}*`;
       newCoins += 10;
     } else {
-      resultado = `💥 *¡OH, QUÉ TRAGEDIA!* Los rodillos muestran un caos total. Has perdido *¥${apuesta.toLocaleString()} ${currency}*. ¡Mejor suerte en la próxima función!`;
+      resultado = `💥 ¡PERDISTE! Se esfuman *¥${apuesta.toLocaleString()} ${currency}*`;
       newCoins -= apuesta;
     }
 
     db.setChatUser(msg.chat, msg.sender, 'lastslot', Date.now());
     db.setChatUser(msg.chat, msg.sender, 'coins', newCoins);
 
-    const finalText = `《✧》| *WACKY SLOTS* 
-────────────────
+    const finalText =
+`╭━━━〔 🎰 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝙁𝙄𝙉𝘼𝙇 〕━━━⬣
+
    ${x[0]}  :  ${y[0]}  :  ${z[0]}
    ${x[1]}  :  ${y[1]}  :  ${z[1]}
    ${x[2]}  :  ${y[2]}  :  ${z[2]}
-────────────────
-${resultado}`;
+
+${resultado}
+
+╰━━━━━━━━━━━━━━━`;
 
     await sock.sendMessage(msg.chat, { text: finalText, edit: key }, { quoted: msg });
   }
