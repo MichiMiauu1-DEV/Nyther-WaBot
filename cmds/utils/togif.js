@@ -14,14 +14,13 @@ export default {
 
     if (!quoted) {
       return sock.sendMessage(chat, {
-        text:
-`╭━━━〔 ⚠️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
-
-📌 Responde a un sticker animado
-
-╰━━━━━━━━━━━━━━━`
+        text: '《✧》 ¡RECHORCHOLIS! ¡Para realizar esta magnífica transmutación visual primero debes responder a un sticker animado! ¡Mi sombrero de copa necesita materia prima para hacer la magia!'
       }, { quoted: msg });
     }
+
+    const id = crypto.randomBytes(4).toString('hex');
+    const webpPath = path.join('./tmp', `${id}.webp`);
+    const gifPath = path.join('./tmp', `${id}.gif`);
 
     try {
 
@@ -32,27 +31,19 @@ export default {
       if (!buffer) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
-          text:
-`╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
-
-🚫 No se pudo descargar el sticker
-
-╰━━━━━━━━━━━━━━━`
+          text: '《✧》 ¡ALERTA EXCEPCIONAL! ¡Los hilos digitales se han enredado y no he podido descargar el sticker de los servidores! Inténtalo de nuevo antes de que perdamos la cordura.'
         }, { quoted: msg });
       }
-
-      const id = crypto.randomBytes(4).toString('hex');
-
-      const webpPath = path.join('./tmp', `${id}.webp`);
-      const gifPath = path.join('./tmp', `${id}.gif`);
 
       if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
 
       fs.writeFileSync(webpPath, buffer);
 
-      // 🎞️ CONVERTIR CON FFMPEG
+      const ffmpegPath = process.env.FFMPEG_PATH || 'ffmpeg';
+
+      // CONVERTIR CON FFMPEG
       await new Promise((resolve, reject) => {
-        exec(`ffmpeg -i ${webpPath} -vf "fps=15,scale=512:-1:flags=lanczos" ${gifPath}`, (err) => {
+        exec(`"${ffmpegPath}" -i ${webpPath} -vf "fps=15,scale=512:-1:flags=lanczos" ${gifPath}`, (err) => {
           if (err) reject(err);
           else resolve();
         });
@@ -61,12 +52,7 @@ export default {
       if (!fs.existsSync(gifPath)) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
-          text:
-`╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
-
-🚫 No se pudo convertir el sticker
-
-╰━━━━━━━━━━━━━━━`
+          text: '《✧》 ...¿Donde esta kinger?'
         }, { quoted: msg });
       }
 
@@ -75,31 +61,24 @@ export default {
       await sock.sendMessage(chat, {
         video: gifBuffer,
         gifPlayback: true,
-        caption:
-`╭━━━〔 🎞️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
-
-✨ Sticker animado convertido a GIF
-
-╰━━━━━━━━━━━━━━━`
+        caption: '《✧》 ¡ESPECTACULAR! ¡Hemos extraído el sticker animado de su prisión estática y aquí tienes tu deslumbrante bucle infinito de diversión digital!'
       }, { quoted: msg });
-
-      // 🧹 CLEAN UP
-      fs.unlinkSync(webpPath);
-      fs.unlinkSync(gifPath);
 
       await msg.react('✔️');
 
     } catch (e) {
-      console.error(e);
+      // El error real se manda directo a la consola del servidor sin dejar rastro en el chat
+      console.error('Anomalía en el comando togif registrada en la consola principal:', e);
+      await msg.react('✖️');
 
+      // Respuesta desorientada en el chat ante el fallo catastrófico
       return sock.sendMessage(chat, {
-        text:
-`╭━━━〔 🚫 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
-
-⚠️ Falló la conversión del sticker
-
-╰━━━━━━━━━━━━━━━`
+        text: '《✧》 ...¿Donde esta kinger?'
       }, { quoted: msg });
+      
+    } finally {
+      if (fs.existsSync(webpPath)) fs.unlinkSync(webpPath);
+      if (fs.existsSync(gifPath)) fs.unlinkSync(gifPath);
     }
   }
 };
