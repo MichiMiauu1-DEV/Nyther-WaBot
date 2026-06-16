@@ -1,4 +1,7 @@
-import axios from 'axios'
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+import { exec } from 'child_process'
 
 export default {
   command: ['togif'],
@@ -38,50 +41,39 @@ export default {
         }, { quoted: msg });
       }
 
-      // 🔍 detectar animación (simple check webp)
-      const isAnimated =
-        buffer.toString('hex').includes('21f9') || // GIF header
-        buffer.length > 100000; // heurística
+      const id = crypto.randomBytes(4).toString('hex');
 
-      if (!isAnimated) {
-        await msg.react('⚠️');
+      const webpPath = path.join('./tmp', `${id}.webp`);
+      const gifPath = path.join('./tmp', `${id}.gif`);
 
-        return sock.sendMessage(chat, {
-          text:
-`╭━━━〔 ⚠️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
+      if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
 
-📌 Este sticker NO es animado
+      fs.writeFileSync(webpPath, buffer);
 
-🎞️ Usa un sticker con movimiento
+      // 🎞️ CONVERTIR CON FFMPEG
+      await new Promise((resolve, reject) => {
+        exec(`ffmpeg -i ${webpPath} -vf "fps=15,scale=512:-1:flags=lanczos" ${gifPath}`, (err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
 
-╰━━━━━━━━━━━━━━━`
-        }, { quoted: msg });
-      }
-
-      // 📡 API CONVERT
-      const res = await axios.post(
-        'https://api.vreden.web.id/api/webp-to-gif',
-        {
-          image: buffer.toString('base64')
-        }
-      );
-
-      const gifUrl = res.data?.result;
-
-      if (!gifUrl) {
+      if (!fs.existsSync(gifPath)) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
           text:
 `╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
 
-🚫 La API no pudo convertir el sticker
+🚫 No se pudo convertir el sticker
 
 ╰━━━━━━━━━━━━━━━`
         }, { quoted: msg });
       }
 
+      const gifBuffer = fs.readFileSync(gifPath);
+
       await sock.sendMessage(chat, {
-        video: { url: gifUrl },
+        video: gifBuffer,
         gifPlayback: true,
         caption:
 `╭━━━〔 🎞️ 𝙏𝙊𝙂𝙄𝙁 〕━━━⬣
@@ -91,18 +83,20 @@ export default {
 ╰━━━━━━━━━━━━━━━`
       }, { quoted: msg });
 
+      // 🧹 CLEAN UP
+      fs.unlinkSync(webpPath);
+      fs.unlinkSync(gifPath);
+
       await msg.react('✔️');
 
     } catch (e) {
       console.error(e);
 
-      await msg.react('❌');
-
       return sock.sendMessage(chat, {
         text:
 `╭━━━〔 🚫 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣
 
-⚠️ Error inesperado al procesar
+⚠️ Falló la conversión del sticker
 
 ╰━━━━━━━━━━━━━━━`
       }, { quoted: msg });
