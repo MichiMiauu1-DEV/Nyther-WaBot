@@ -19,45 +19,61 @@ export default {
     try {
       await msg.react('🕒');
 
-      // Consultamos a una API espejo de imágenes de código abierto de alta definición (libre de bloqueos de IP)
-      const response = await fetch(`https://api.unsplash.com/search/photos?page=1&query=${encodeURIComponent(text)}&client_id=Source`);
+      // Simulamos un navegador web real y moderno para engañar a los sistemas de Google
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(text)}&tbm=isch&asearch=ichunk&async=_id:rg_s,_pms:s,_fmt:pc`;
       
-      let imageUrl = null;
-      let title = text;
+      const response = await fetch(searchUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3'
+        }
+      });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.results && data.results.length > 0) {
-          // Extraemos la versión regular/completa de la primera imagen encontrada
-          imageUrl = data.results[0].urls.regular;
-          title = data.results[0].alt_description || text;
+      if (!response.ok) throw new Error(`Google respondió con estado: ${response.status}`);
+
+      const html = await response.text();
+
+      // Expresión regular mística para cazar URLs de imágenes reales (compatibles con JPG/PNG) dentro del HTML de Google
+      const regex = /"(https?:\/\/[^"]+?\.(?:jpg|jpeg|png))"/g;
+      const links = [];
+      let match;
+
+      while ((match = regex.exec(html)) !== null) {
+        // Evitamos capturar enlaces internos repetitivos de los servidores de Google
+        if (!match[1].includes('google.com') && !match[1].includes('gstatic.com')) {
+          links.push(match[1]);
         }
       }
 
-      // FALLBACK DE EMERGENCIA: Si Unsplash no responde o viene vacío, usamos el motor espejo de Lexica Art
-      if (!imageUrl) {
-        const fallbackRes = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(text)}`);
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          if (fallbackData && fallbackData.images && fallbackData.images.length > 0) {
-            imageUrl = fallbackData.images[0].src;
+      // Si el primer raspado estricto falla, usamos un filtro más amplio para capturar imágenes cifradas de Google
+      if (links.length === 0) {
+        const backupRegex = /\["https?:\/\/encrypted-tbn0\.gstatic\.com\/images\?q=tbn:[^"]+",\d+,\d+\]/g;
+        const backupMatches = html.match(backupRegex);
+        if (backupMatches) {
+          for (const item of backupMatches) {
+            const urlMatch = item.match(/"(https?:\/\/[^"]+)"/);
+            if (urlMatch) links.push(urlMatch[1]);
           }
         }
       }
 
-      // Si después de ambos intentos seguimos en el vacío absoluto
-      if (!imageUrl) {
+      // Si de verdad el array sigue completamente vacío tras los dos intentos de rastreo
+      if (links.length === 0) {
         await msg.react('❌');
         return sock.sendMessage(chat, {
           text: '《✧》 ¡VAYA, VAYA! ¡Parece que los servidores de la gran red han escondido sus tesoros! No se encontró ninguna información o imagen para tu búsqueda.'
         }, { quoted: msg });
       }
 
+      // Seleccionamos la primera imagen del glorioso desfile de resultados
+      const imageUrl = links[0];
+
       const captionText = `《✧》 *¡ESPECTACULAR!* Aquí tienes el enlace directo extraído de los confines de la red:\n\n` +
-                          `• *Título ›* ${title}\n` +
+                          `• *Título ›* ${text}\n` +
                           `• *Enlace ›* ${imageUrl}`;
 
-      // Enviamos la imagen y el texto al chat de WhatsApp
+      // Enviamos el paquete visual directamente a las manos del remitente
       await sock.sendMessage(chat, {
         image: { url: imageUrl },
         caption: captionText
@@ -66,11 +82,11 @@ export default {
       await msg.react('✔️');
 
     } catch (e) {
-      // Mandamos el verdadero error técnico a la consola del panel de control
+      // Registramos el percance en la consola principal de DuckCloud/Opik
       console.error('Anomalía en el comando de imágenes registrada en la consola principal:', e);
       await msg.react('✖️');
 
-      // Si los servidores se caen por completo, el rey del tablero toma el escenario
+      // Escape de emergencia si los engranajes se rompen por completo
       return sock.sendMessage(chat, {
         text: '《✧》 ...¿Donde esta kinger?'
       }, { quoted: msg });
