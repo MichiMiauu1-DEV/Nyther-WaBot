@@ -255,7 +255,7 @@ A) ${options[0]}
 B) ${options[1]}
 C) ${options[2]}
 
-✍️ Responde: *trivia a / b / c
+✍️ Responde: *marvel a / b / c
 ⏳ 45s
 ╰━━━━━━━━━━━━━━━`
     }, { quoted: msg });
