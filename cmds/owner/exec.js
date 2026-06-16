@@ -10,12 +10,11 @@ export default {
   run: async ({ msg, sock, args, command, text, __dirname }) => {
     const require = createRequire(__dirname);
     if (!text.trim()) {
-      return sock.reply ? await sock.reply(msg.chat, '《✧》 Debes escribir un comando a ejecutar.', msg) : console.log('sock.reply no definido');
+      return sock.reply(msg.chat, '《✧》 Debes escribir un comando a ejecutar.', msg);
     }
     
     // Limpia comillas tipográficas que pone WhatsApp: ‘ ’ “ ”
     let code = text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
-    
     let _return, _syntax = '';    
 
     try {
@@ -23,8 +22,8 @@ export default {
       let i = 15;
       let f = { exports: {} };
       
-      // Ya no necesitamos envolver en una IIFE porque el constructor ya genera la función asíncrona.
-      // Simplemente retornamos el resultado del código inyectado.
+      // Ejecutamos el código directamente dentro del constructor asíncrono
+      // Esto permite que las expresiones simples o los awaits devuelvan su valor de forma natural
       let exec = new (async () => {}).constructor(
         'print', 'msg', 'sock', 'require', 'Array', 'process', 'args', 'module', 'exports', 'argument',
         `return (async () => { ${code} })()`
@@ -34,7 +33,7 @@ export default {
         sock, 
         (...args) => {
           if (--i < 1) return;
-          return sock.reply ? sock.reply(msg.chat, format(...args), msg) : null;
+          return sock.reply(msg.chat, format(...args), msg);
         }, 
         msg, sock, require, Array, process, args, f, f.exports, 
       );
@@ -50,11 +49,8 @@ export default {
       _return = e;
       await msg.react('✖️');
     } finally {
-      // Aseguramos que responda si el formato del log devuelve algo válido o el error
-      const output = _syntax + format(_return);
-      if (output && output.trim() !== 'undefined') {
-        if (sock.reply) await sock.reply(msg.chat, output, msg);
-      }
+      // Enviamos la respuesta SÍ O SÍ, mostrando "undefined" si no retornó ningún valor
+      await sock.reply(msg.chat, _syntax + format(_return), msg);
     }
   }
 };
