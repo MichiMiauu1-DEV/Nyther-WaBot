@@ -1,14 +1,19 @@
 import syntaxerror from 'syntax-error';
 import { format } from 'util';
 import { createRequire } from 'module';
+import { pathToFileURL } from 'url';
 
 export default {
   command: ['ex', 'e'],
   category: 'owner',
   description: 'Ejecutar código JavaScript en el bot.',
   isOwner: true,
-  run: async ({ msg, sock, args, command, text, __dirname }) => {
-    const require = createRequire(__dirname);
+  run: async ({ msg, sock, args, command, text }) => {
+    
+    // CREACIÓN INMUNE DE REQUIRE: Usamos import.meta.url que ya viene formateado de fábrica como una URL válida.
+    // Esto es 100% nativo de ESM y jamás devolverá undefined en ningún entorno de hosting.
+    const require = createRequire(import.meta.url);
+
     if (!text.trim()) {
       return sock.reply(msg.chat, '《✧》 ¡RECHORCHOLIS! ¡Para encender los motores de la genialidad primero debes proporcionarme un comando a ejecutar! ¡No puedo sacar conejos de un sombrero completamente vacío, mi estimado dueño!', msg);
     }
@@ -68,12 +73,17 @@ export default {
       _return = e;
       await msg.react('✖️');
     } finally {
-      // Garantiza que el bot siempre te devuelva una respuesta en el chat con el toque de Caine
-      const finalOutput = _return instanceof Error 
-        ? `《✧》 *¡SANTO DIOS!* Algo salió terriblemente mal en nuestro maravilloso simulador digital:\n> ${format(_return)}`
-        : `《✧》 *¡ESPECTACULAR!* El gran vacío de la terminal nos ha devuelto esta magnífica reliquia de datos:\n\n${_syntax}${format(_return)}`;
-        
-      await sock.reply(msg.chat, finalOutput, msg);
+      // Si el error fue un fallo interno de Node que se saltó el entorno, mostramos a Kinger
+      if (_return && _return.message && _return.message.includes('ERR_INVALID_ARG_VALUE')) {
+        await sock.reply(msg.chat, '《✧》 ...¿Donde esta kinger?', msg);
+      } else {
+        // Garantiza que el bot siempre te devuelva una respuesta en el chat con el toque de Caine
+        const finalOutput = _return instanceof Error 
+          ? `《✧》 *¡SANTO DIOS!* Algo salió terriblemente mal en nuestro maravilloso simulador digital:\n> ${format(_return)}`
+          : `《✧》 *¡ESPECTACULAR!* El gran vacío de la terminal nos ha devuelto esta magnífica reliquia de datos:\n\n${_syntax}${format(_return)}`;
+          
+        await sock.reply(msg.chat, finalOutput, msg);
+      }
     }
   }
 };
