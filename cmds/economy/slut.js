@@ -6,36 +6,61 @@ export default {
   description: 'Participar en los desafíos de altísimo riesgo de Caine.',
   run: async ({ msg, sock, usedPrefix, text }) => {
     const chatId = msg.chat;
-    const senderId = msg.sender;    
+    const senderId = msg.sender;
     const chatData = db.getChat(chatId);
 
-    // Si la economía está apagada en esta zona de la simulación
+    // 🎪 𝘾𝙄𝙍𝘾𝙊 𝘿𝙄𝙂𝙄𝙏𝘼𝙇 - ECONOMÍA
     if (chatData.adminonly || !chatData.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🎪 𝘾𝙄𝙍𝘾𝙊 𝘿𝙄𝙂𝙄𝙏𝘼𝙇 〕━━━⬣
+
+🚫 ¡RECHORCHOLIS!
+
+La economía de este maravilloso espectáculo ha sido PAUSADA por el sistema del Circo Digital.
+
+🎭 Caine ha cerrado temporalmente la función de recompensas.
+
+💡 Pide a un administrador activar:
+» *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
 
-    const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';    
+    const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     const botSettings = db.getSettings(botId);
-    db.setCreate('chat_users', [chatId, senderId], 'lastslut', 0);    
-    const user = db.getChatUser(chatId, senderId);    
+
+    db.setCreate('chat_users', [chatId, senderId], 'lastslut', 0);
+    const user = db.getChatUser(chatId, senderId);
+
     const cooldown = 5 * 60 * 1000;
     const now = Date.now();
     const remaining = (user.lastslut || 0) - now;
-    const currency = botSettings.currency;    
+    const currency = botSettings.currency;
 
-    // Control del reloj del circo
+    // 🎪 𝘾𝘼𝙄𝙉𝙀 𝙎𝙔𝙎𝙏𝙀𝙈 - TIEMPO
     if (remaining > 0) {
-      return msg.reply(`《✧》 ¡ALTO AHÍ, TEMERARIO AVENTURERO! Tus circuitos aún están sobrecalentados por el último show. Debes esperar *${msToTime(remaining)}* antes de tentar al destino otra vez.`);
-    }    
+      return msg.reply(`╭━━━〔 ⏱️ 𝘾𝘼𝙄𝙉𝙀 𝙎𝙔𝙎𝙏𝙀𝙈 〕━━━⬣
+
+🚫 ¡ALTO AHÍ, TEMERARIO AVENTURERO!
+
+Tus circuitos aún están en enfriamiento después del último espectáculo.
+
+⏳ Debes esperar:
+➜ *${msToTime(remaining)}*
+
+🎭 El Circo Digital aún no está listo para otra función contigo...
+
+╰━━━━━━━━━━━━━━━`);
+    }
 
     const success = Math.random() < 0.5;
-    const amount = success ? 
-      Math.floor(Math.random() * (6000 - 3500 + 1)) + 3500 : 
-      Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;    
 
-    db.setChatUser(chatId, senderId, 'lastslut', now + cooldown);    
+    const amount = success
+      ? Math.floor(Math.random() * (6000 - 3500 + 1)) + 3500
+      : Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
 
-    // ¡HISTORIAS DE VICTORIA EN EL ESCENARIO!
+    db.setChatUser(chatId, senderId, 'lastslut', now + cooldown);
+
+    // 🎪 VICTORIAS
     const winMessages = [
       `¡Te ofreciste como voluntario para que Jax te lanzara cuchillos con los ojos vendados y sobreviviste! Ganaste *¥${amount.toLocaleString()} ${currency}*!`,
       `¡Hiciste malabares con cinco Gloinks explosivos en frente de todo el elenco sin pestañear! Ganaste *¥${amount.toLocaleString()} ${currency}*!`,
@@ -53,7 +78,7 @@ export default {
       `¡Apostaste todas tus fichas en la ruleta rusa de sombreros mágicos de Caine y acertaste! Ganaste *¥${amount.toLocaleString()} ${currency}*!`
     ];
 
-    // ¡HISTORIAS DE FRACASO ABSOLUTO!
+    // 🎪 DERROTAS
     const loseMessages = [
       `¡Te distrajiste mirando fijamente al Sol, tropezaste con un cable y perdiste *¥${amount.toLocaleString()} ${currency}*!`,
       `¡Jax te puso una zancadilla justo antes de terminar tu acto acrobático en el trapecio! Perdiste *¥${amount.toLocaleString()} ${currency}*.`,
@@ -66,13 +91,38 @@ export default {
       `¡Intentaste desafiarme en un duelo de magia y terminé convirtiendo tus monedas en mariposas virtuales! Perdiste *¥${amount.toLocaleString()} ${currency}*.`
     ];
 
-    const message = success ? winMessages[Math.floor(Math.random() * winMessages.length)] : loseMessages[Math.floor(Math.random() * loseMessages.length)];
-    
-    // Procesamiento de las finanzas del usuario
+    const resultText = success
+      ? winMessages[Math.floor(Math.random() * winMessages.length)]
+      : loseMessages[Math.floor(Math.random() * loseMessages.length)];
+
+    const message = success
+      ? `╭━━━〔 🎪 𝘿𝙀𝙎𝘼𝙁𝙄𝙊 𝙀𝙓𝙏𝙍𝙀𝙈𝙊 〕━━━⬣
+
+✨ ${resultText}
+
+💰 Recompensa:
+➜ +${amount.toLocaleString()} ${currency}
+
+🎭 Caine observa tu actuación...
+
+╰━━━━━━━━━━━━━━━`
+      : `╭━━━〔 🚫 𝘿𝙀𝙎𝘼𝙁𝙄𝙊 𝙁𝘼𝙇𝙇𝙄𝘿𝙊 〕━━━⬣
+
+⚠️ ${resultText}
+
+💸 Pérdida:
+➜ -${amount.toLocaleString()} ${currency}
+
+🎭 El Circo Digital se ríe de tu caída...
+
+╰━━━━━━━━━━━━━━━`;
+
+    // 💰 ECONOMÍA
     if (success) {
       db.setChatUser(chatId, senderId, 'coins', (user.coins || 0) + amount);
     } else {
       const total = (user.coins || 0) + (user.bank || 0);
+
       if (total >= amount) {
         if (user.coins >= amount) {
           db.setChatUser(chatId, senderId, 'coins', (user.coins || 0) - amount);
@@ -85,19 +135,24 @@ export default {
         db.setChatUser(chatId, senderId, 'coins', 0);
         db.setChatUser(chatId, senderId, 'bank', 0);
       }
-    }   
+    }
 
-    // ¡Enviamos el resultado final al chat con los honores correspondientes!
-    await sock.sendMessage(chatId, { text: `《✧》 ${message}`, mentions: [senderId] }, { quoted: msg });
+    await sock.sendMessage(
+      chatId,
+      { text: message, mentions: [senderId] },
+      { quoted: msg }
+    );
   }
 };
 
 const msToTime = (duration) => {
   const seconds = Math.floor((duration / 1000) % 60);
   const minutes = Math.floor((duration / (1000 * 60)) % 60);
-  const pad = (n) => n.toString().padStart(2, '0');  
+  const pad = (n) => n.toString().padStart(2, '0');
+
   if (minutes === 0) {
     return `${pad(seconds)} segundo${seconds !== 1 ? 's' : ''}`;
   }
+
   return `${pad(minutes)} minuto${minutes !== 1 ? 's' : ''}, ${pad(seconds)} segundo${seconds !== 1 ? 's' : ''}`;
 };
