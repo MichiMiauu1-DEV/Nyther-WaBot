@@ -49,7 +49,7 @@ export default {
     const text =
 `╭━━━〔 🏳️‍🌈 GAY METER 〕━━━⬣
 
-${targetTag} eres **${percentage}%** gay
+${targetTag} eres *${percentage}%* gay
 
 ${comment}
 
