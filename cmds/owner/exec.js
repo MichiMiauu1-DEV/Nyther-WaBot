@@ -10,29 +10,31 @@ export default {
   run: async ({ msg, sock, args, command, text, __dirname }) => {
     const require = createRequire(__dirname);
     if (!text.trim()) {
-      return sock.reply(msg.chat, '《✧》 Debes escribir un comando a ejecutar.', msg);
+      return sock.reply ? await sock.reply(msg.chat, '《✧》 Debes escribir un comando a ejecutar.', msg) : console.log('sock.reply no definido');
     }
     
     // Limpia comillas tipográficas que pone WhatsApp: ‘ ’ “ ”
     let code = text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
     
-    // Envuelve en IIFE para poder usar await sin poner return
-    let _text = `(async () => { ${code} })()`;
     let _return, _syntax = '';    
 
     try {
       await msg.react('🕒');
       let i = 15;
       let f = { exports: {} };
+      
+      // Ya no necesitamos envolver en una IIFE porque el constructor ya genera la función asíncrona.
+      // Simplemente retornamos el resultado del código inyectado.
       let exec = new (async () => {}).constructor(
-        'print', 'msg', 'sock', 'require', 'Array', 'process', 'args', 'module', 'exports', 'argument', _text
+        'print', 'msg', 'sock', 'require', 'Array', 'process', 'args', 'module', 'exports', 'argument',
+        `return (async () => { ${code} })()`
       );
       
       _return = await exec.call(
         sock, 
         (...args) => {
           if (--i < 1) return;
-          return sock.reply(msg.chat, format(...args), msg);
+          return sock.reply ? sock.reply(msg.chat, format(...args), msg) : null;
         }, 
         msg, sock, require, Array, process, args, f, f.exports, 
       );
@@ -48,7 +50,11 @@ export default {
       _return = e;
       await msg.react('✖️');
     } finally {
-      sock.reply(msg.chat, _syntax + format(_return), msg);
+      // Aseguramos que responda si el formato del log devuelve algo válido o el error
+      const output = _syntax + format(_return);
+      if (output && output.trim() !== 'undefined') {
+        if (sock.reply) await sock.reply(msg.chat, output, msg);
+      }
     }
   }
 };
