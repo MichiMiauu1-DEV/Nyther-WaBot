@@ -52,15 +52,29 @@ export default {
       
       clearTimeout(juego.tiempoLimite);
       delete global.math[chatId];
-      await sock.reply(chatId, `《✧》 ¡CORRECTO! ¡Tus circuitos funcionan a la perfección!\n> Ganaste: *¥${coinsAleatorio.toLocaleString()}*`, msg);
+      await sock.reply(chatId, `╭━━━〔 ✅ 𝙍𝙀𝙎𝙋𝙐𝙀𝙎𝙏𝘼 𝘾𝙊𝙍𝙍𝙀𝘾𝙏𝘼 〕━━━⬣
+
+¡CORRECTO! ¡Tus circuitos funcionan a la perfección!
+
+> Ganaste: *¥${coinsAleatorio.toLocaleString()}*
+
+╰━━━━━━━━━━━━━━━`, msg);
     } else {
       juego.intentos += 1;
       if (juego.intentos >= 3) {
         clearTimeout(juego.tiempoLimite);
         delete global.math[chatId];
-        await sock.reply(chatId, '《✧》 ¡TE HAS QUEDADO SIN INTENTOS! El examen ha terminado. ¡Intenta de nuevo más tarde!', msg);
+        await sock.reply(chatId, `╭━━━〔 ❌ 𝙁𝙄𝙉 𝘿𝙀𝙇 𝙀𝙓𝘼𝙈𝙀𝙉 〕━━━⬣
+
+¡TE HAS QUEDADO SIN INTENTOS! El examen ha terminado. ¡Intenta de nuevo más tarde!
+
+╰━━━━━━━━━━━━━━━`, msg);
       } else {
-        await sock.reply(chatId, `《✧》 ¡ERROR DE CÁLCULO! Respuesta incorrecta. Te quedan *${3 - juego.intentos}* intentos.`, msg);
+        await sock.reply(chatId, `╭━━━〔 ⚠️ 𝙀𝙍𝙍𝙊𝙍 𝘿𝙀 𝘾𝘼𝙇𝘾𝙐𝙇𝙊 〕━━━⬣
+
+¡ERROR DE CÁLCULO! Respuesta incorrecta. Te quedan *${3 - juego.intentos}* intentos.
+
+╰━━━━━━━━━━━━━━━`, msg);
       }
     }
     return true;
@@ -71,20 +85,43 @@ export default {
     const chat = db.getChat(chatId);
     
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     if (global.math[chatId]?.juegoActivo) {
-      return sock.reply(chatId, '《✧》 ¡YA HAY UNA PRUEBA EN CURSO! Espera a que termine o a que el tiempo se agote.', msg);
+      return sock.reply(chatId, `╭━━━〔 ⏳ 𝙋𝙍𝙐𝙀𝘽𝘼 𝙀𝙉 𝘾𝙐𝙍𝙎𝙊 〕━━━⬣
+
+¡YA HAY UNA PRUEBA EN CURSO! Espera a que termine o a que el tiempo se agote.
+
+╰━━━━━━━━━━━━━━━`, msg);
     }
     
     const dificultad = args[0]?.toLowerCase();
     if (!limits[dificultad]) {
-      return sock.reply(chatId, '《✧》 ¡ELÍGE TU NIVEL DE SUFRIMIENTO!\n> Dificultades: *facil, medio, dificil, imposible, imposible2*', msg);
+      return sock.reply(chatId, `╭━━━〔 🔢 𝙀𝙇𝙄𝙂𝙀 𝙏𝙐 𝘿𝙄𝙁𝙄𝘾𝙐𝙇𝙏𝘼𝘿 〕━━━⬣
+
+¡ELÍGE TU NIVEL DE SUFRIMIENTO!
+> Dificultades: *facil, medio, dificil, imposible, imposible2*
+
+╰━━━━━━━━━━━━━━━`, msg);
     }
     
     const { problema, resultado } = generarProblema(dificultad);
-    const problemMessage = await sock.reply(chatId, `*《✧》 EXAMEN MATEMÁTICO DEL CIRCO* \`🎪\`\n\n> Tienes 60 segundos para resolver:\n> *${problema}*\n\n✐ _¡Responde con el número correcto!_`, msg);
+    const problemMessage = await sock.reply(chatId, `╭━━━〔 🎪 𝙀𝙓𝘼𝙈𝙀𝙉 𝙈𝘼𝙏𝙀𝙈𝘼𝙏𝙄𝘾𝙊 〕━━━⬣
+
+Tienes 60 segundos para resolver:
+> *${problema}*
+
+✐ _¡Responde con el número correcto!_
+
+╰━━━━━━━━━━━━━━━`, msg);
     
     global.math[chatId] = { 
       juegoActivo: true, 
@@ -97,9 +134,14 @@ export default {
       tiempoLimite: setTimeout(() => {
         if (global.math[chatId]?.juegoActivo) {
           delete global.math[chatId];
-          sock.reply(chatId, `《✧》 ¡TIEMPO AGOTADO! El examen ha terminado. La respuesta era *${resultado}*.`, msg);
+          sock.reply(chatId, `╭━━━〔 ⏰ 𝙏𝙄𝙀𝙈𝙋𝙊 𝘼𝙂𝙊𝙏𝘼𝘿𝙊 〕━━━⬣
+
+¡TIEMPO AGOTADO! El examen ha terminado. La respuesta era *${resultado}*.
+
+╰━━━━━━━━━━━━━━━`, msg);
         }
       }, 60000)
     };
   }
 };
+  
