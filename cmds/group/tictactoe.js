@@ -76,7 +76,7 @@ export default {
       db.setChatUser(chat, g.player2, 'coins', p2.coins - g.bet);
       g.type = "game";
       g.turn = g.player1;
-      return sock.sendMessage(chat, { text: "╭━━━〔 🎮 𝙋𝘼𝙍𝙏𝙄𝘿𝘼 𝙄𝙉𝙄𝘾𝙄𝘼𝘿𝘼 〕━━━⬣\n\n¡Apuestas bloqueadas!\n\n╰━━━━━━━━━━━━━━━", mentions: [g.player1, g.player2] }, { quoted: msg });
+      return sock.sendMessage(chat, { text: `╭━━━〔 🎮 𝙋𝘼𝙍𝙏𝙄𝘿𝘼 𝙄𝙉𝙄𝘾𝙄𝘼𝘿𝘼 〕━━━⬣\n\n¡Apuestas bloqueadas!\n${drawBoard(g.board)}\n\nTurno: @${g.turn.split('@')[0]} (❌)\n\n╰━━━━━━━━━━━━━━━`, mentions: [g.player1, g.player2] }, { quoted: msg });
     }
 
     // 🔴 RECHAZAR / CANCELAR
@@ -95,10 +95,15 @@ export default {
     if (isNaN(pos) || pos < 0 || pos > 8 || board[pos]) return sock.reply(chat, "╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣\n\nCasilla inválida u ocupada.\n\n╰━━━━━━━━━━━━━━━", msg);
     if (g.type === "game" && g.turn !== msg.sender) return sock.reply(chat, "╭━━━〔 ⏳ 𝙀𝙎𝙋𝙀𝙍𝘼 〕━━━⬣\n\nNo es tu turno.\n\n╰━━━━━━━━━━━━━━━", msg);
 
-    board[pos] = "❌";
+    // Asignar símbolo: P1 es ❌, P2 es ⭕
+    let symbol = "❌";
+    if (g.type === "game") {
+        symbol = (msg.sender === g.player1) ? "❌" : "⭕";
+    }
+    board[pos] = symbol;
 
     // 🏆 VICTORIA
-    if (checkWin(board, "❌")) {
+    if (checkWin(board, symbol)) {
       const prize = g.bet * 2;
       let uWin = db.getChatUser(chat, userId);
       db.setChatUser(chat, userId, 'coins', (uWin.coins || 0) + prize);
@@ -155,7 +160,7 @@ export default {
       }
     } else { g.turn = g.turn === g.player1 ? g.player2 : g.player1; }
 
-    sock.reply(chat, `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${drawBoard(board)}\n\n🎯 ${g.type === "bot" ? "Tu turno." : "Turno: <@" + g.turn.split('@')[0] + ">"}\n╰━━━━━━━━━━━━━━━`, msg);
+    const nextSymbol = (g.turn === g.player1) ? "❌" : "⭕";
+    sock.sendMessage(chat, { text: `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${drawBoard(board)}\n\n🎯 Turno: @${g.turn.split('@')[0]} (${nextSymbol})\n╰━━━━━━━━━━━━━━━`, mentions: [g.turn] }, { quoted: msg });
   }
 };
-            
