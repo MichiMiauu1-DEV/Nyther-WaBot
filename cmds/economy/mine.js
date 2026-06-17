@@ -6,7 +6,14 @@ export default {
   run: async ({ msg, sock, usedPrefix }) => {
     const chat = db.getChat(msg.chat);
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`ꕥ Los comandos de *Economía* están desactivados en este grupo.\n\nUn *administrador* puede activarlos con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+Los comandos de Economía están desactivados en este grupo.
+
+Un administrador puede activarlos con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     const botId = sock?.user?.id.split(':')[0] + '@s.whatsapp.net';
     const botSettings = db.getSettings(botId);
@@ -19,19 +26,41 @@ export default {
     }    
     const staminaConsumed = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
     if (user.stamina < staminaConsumed) {
-      return msg.reply(`ꕥ No tienes suficiente energía para ir a minar.\n> Usa *${usedPrefix}heal* para curarte.`);
+      return msg.reply(`╭━━━〔 ⚡ 𝙀𝙉𝙀𝙍𝙂𝙄𝘼 𝘽𝘼𝙅𝘼 〕━━━⬣
+
+No tienes suficiente energía para ir a minar.
+
+> Usa *${usedPrefix}heal* para curarte.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     if (!user.tools?.pico) {
-      return msg.reply(`ꕥ Necesitas un Pico para minar.\n> Compra uno en la tienda con: *${usedPrefix}buy pico*`);
+      return msg.reply(`╭━━━〔 ⛏️ 𝙁𝘼𝙇𝙏𝘼 𝙋𝙄𝘾𝙊 〕━━━⬣
+
+Necesitas un Pico para minar.
+
+> Compra uno en la tienda con: *${usedPrefix}buy pico*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     if (user.tools.pico.durability <= 10) {
       delete user.tools.pico;
       db.setChatUser(msg.chat, msg.sender, 'tools', user.tools);
-      return msg.reply(`ꕥ Tu Pico se ha roto por el uso y ha sido eliminado de tu inventario.\n> Compra uno nuevo con: *${usedPrefix}buy pico*`);
+      return msg.reply(`╭━━━〔 🛠️ 𝙋𝙄𝘾𝙊 𝙍𝙊𝙏𝙊 〕━━━⬣
+
+Tu Pico se ha roto por el uso y ha sido eliminado de tu inventario.
+
+> Compra uno nuevo con: *${usedPrefix}buy pico*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     const remaining = user.lastmine - Date.now();
     if (remaining > 0) {
-      return msg.reply(`ꕥ Debes esperar *${msToTime(remaining)}* para minar de nuevo.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙀𝙎𝙋𝙀𝙍𝘼 〕━━━⬣
+
+Debes esperar *${msToTime(remaining)}* para minar de nuevo.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     user.stamina -= staminaConsumed;
     db.setChatUser(msg.chat, msg.sender, 'stamina', user.stamina);    
@@ -48,7 +77,7 @@ export default {
     if (isLegendary) {
       reward = Math.floor(Math.random() * (13000 - 11000 + 1)) + 11000;
       narration = '¡DESCUBRISTE UN TESORO LEGENDARIO!\n\n';
-      bonusMsg = '\nꕥ Recompensa ÉPICA obtenida!';
+      bonusMsg = '\nRecompensa ÉPICA obtenida!';
     } else {
       reward = Math.floor(Math.random() * (9500 - 7000 + 1)) + 7000;
       const scenario = pickRandom(escenarios);
@@ -56,13 +85,16 @@ export default {
       if (Math.random() < 0.1) {
         const bonus = Math.floor(Math.random() * (4500 - 2500 + 1)) + 2500;
         reward += bonus;
-        bonusMsg = `\n「✿」 ¡Bonus de minería! Ganaste *${bonus.toLocaleString()}* ${monedas} extra`;
+        bonusMsg = `\n¡Bonus de minería! Ganaste *${bonus.toLocaleString()}* ${monedas} extra`;
       }
     }    
     user.coins += reward;
     db.setChatUser(msg.chat, msg.sender, 'coins', user.coins);    
-    let caption = `「✿」 ${narration} *${reward.toLocaleString()} ${monedas}*`;
-    if (bonusMsg) caption += `\n${bonusMsg}`;
+    let caption = `╭━━━〔 💎 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝙈𝙄𝙉𝙀𝙍𝙊 〕━━━⬣
+
+${narration} *${reward.toLocaleString()} ${monedas}*${bonusMsg}
+
+╰━━━━━━━━━━━━━━━`;
     await sock.reply(msg.chat, caption, msg);
   }
 };
