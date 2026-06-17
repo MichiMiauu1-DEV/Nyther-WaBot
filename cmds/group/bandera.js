@@ -31,7 +31,6 @@ const flags = [
   { flag: "🇵🇪", answer: "peru" },
   { flag: "🇺🇾", answer: "uruguay" },
   { flag: "🇻🇪", answer: "venezuela" },
-
   { flag: "🇺🇸", answer: "estados unidos" },
   { flag: "🇪🇸", answer: "españa" },
   { flag: "🇫🇷", answer: "francia" },
@@ -42,7 +41,6 @@ const flags = [
   { flag: "🇮🇪", answer: "irlanda" },
   { flag: "🇳🇱", answer: "paises bajos" },
   { flag: "🇧🇪", answer: "belgica" },
-
   { flag: "🇨🇭", answer: "suiza" },
   { flag: "🇦🇹", answer: "austria" },
   { flag: "🇸🇪", answer: "suecia" },
@@ -53,7 +51,6 @@ const flags = [
   { flag: "🇺🇦", answer: "ucrania" },
   { flag: "🇷🇺", answer: "rusia" },
   { flag: "🇬🇷", answer: "grecia" },
-
   { flag: "🇹🇷", answer: "turquia" },
   { flag: "🇰🇷", answer: "corea del sur" },
   { flag: "🇰🇵", answer: "corea del norte" },
@@ -64,7 +61,6 @@ const flags = [
   { flag: "🇵🇭", answer: "filipinas" },
   { flag: "🇸🇬", answer: "singapur" },
   { flag: "🇲🇾", answer: "malasia" },
-
   { flag: "🇦🇺", answer: "australia" },
   { flag: "🇳🇿", answer: "nueva zelanda" },
   { flag: "🇪🇬", answer: "egipto" },
@@ -75,7 +71,6 @@ const flags = [
   { flag: "🇸🇦", answer: "arabia saudita" },
   { flag: "🇦🇪", answer: "emiratos arabes unidos" },
   { flag: "🇮🇱", answer: "israel" },
-
   { flag: "🇶🇦", answer: "qatar" },
   { flag: "🇰🇪", answer: "kenia" },
   { flag: "🇪🇹", answer: "etiopia" },
@@ -86,7 +81,6 @@ const flags = [
   { flag: "🇩🇴", answer: "republica dominicana" },
   { flag: "🇯🇲", answer: "jamaica" },
   { flag: "🇭🇹", answer: "haiti" },
-
   { flag: "🇮🇸", answer: "islandia" },
   { flag: "🇨🇿", answer: "republica checa" },
   { flag: "🇭🇺", answer: "hungria" },
@@ -100,7 +94,63 @@ const flags = [
   { flag: "🇪🇨", answer: "ecuador" },
   { flag: "🇬🇹", answer: "guatemala" },
   { flag: "🇭🇳", answer: "honduras" },
-  { flag: "🇳🇮", answer: "nicaragua" }
+  { flag: "🇳🇮", answer: "nicaragua" },
+  { flag: "🇯🇵", answer: "japon" },
+  { flag: "🇸🇻", answer: "el salvador" },
+  { flag: "🇵🇷", answer: "puerto rico" },
+  { flag: "🇧🇧", answer: "barbados" },
+  { flag: "🇧🇸", answer: "bahamas" },
+  { flag: "🇹🇹", answer: "trinidad y tobago" },
+  { flag: "🇧🇿", answer: "belice" },
+  { flag: "🇱🇺", answer: "luxemburgo" },
+  { flag: "🇲🇹", answer: "malta" },
+  { flag: "🇨🇾", answer: "chipre" },
+  { flag: "🇱🇻", answer: "letonia" },
+  { flag: "🇱🇹", answer: "lituania" },
+  { flag: "🇪🇪", answer: "estonia" },
+  { flag: "🇸🇮", answer: "eslovenia" },
+  { flag: "🇲🇪", answer: "montenegro" },
+  { flag: "🇦🇱", answer: "albania" },
+  { flag: "🇧🇦", answer: "bosnia y herzegovina" },
+  { flag: "🇲🇰", answer: "macedonia del norte" },
+  { flag: "🇲🇩", answer: "moldavia" },
+  { flag: "🇧🇾", answer: "bielorrusia" },
+  { flag: "🇮🇩", answer: "indonesia" },
+  { flag: "🇵🇰", answer: "pakistan" },
+  { flag: "🇧🇩", answer: "bangladesh" },
+  { flag: "🇱🇰", answer: "sri lanka" },
+  { flag: "🇰🇿", answer: "kazajistan" },
+  { flag: "🇺🇿", answer: "uzbekistan" },
+  { flag: "🇰🇬", answer: "kirguistan" },
+  { flag: "🇹🇯", answer: "tayikistan" },
+  { flag: "🇹🇲", answer: "turkmenistan" },
+  { flag: "🇮🇷", answer: "iran" },
+  { flag: "🇮🇶", answer: "iraq" },
+  { flag: "🇯🇴", answer: "jordania" },
+  { flag: "🇱🇧", answer: "libano" },
+  { flag: "🇸🇾", answer: "siria" },
+  { flag: "🇰🇼", answer: "kuwait" },
+  { flag: "🇴🇲", answer: "oman" },
+  { flag: "🇾🇪", answer: "yemen" },
+  { flag: "🇲🇳", answer: "mongolia" },
+  { flag: "🇳🇵", answer: "nepal" },
+  { flag: "🇧🇹", answer: "butan" },
+  { flag: "🇲🇲", answer: "myanmar" },
+  { flag: "🇰🇭", answer: "camboya" },
+  { flag: "🇱🇦", answer: "laos" },
+  { flag: "🇲🇬", answer: "madagascar" },
+  { flag: "🇨🇲", answer: "camerun" },
+  { flag: "🇸🇳", answer: "senegal" },
+  { flag: "🇨🇮", answer: "costa de marfil" },
+  { flag: "🇿🇼", answer: "zimbabue" },
+  { flag: "🇺🇬", answer: "uganda" },
+  { flag: "🇹🇿", answer: "tanzania" },
+  { flag: "🇷🇼", answer: "ruanda" },
+  { flag: "🇦🇴", answer: "angola" },
+  { flag: "🇿🇲", answer: "zambia" },
+  { flag: "🇲🇿", answer: "mozambique" },
+  { flag: "🇳🇦", answer: "namibia" },
+  { flag: "🇧🇼", answer: "botsuana" }
 ];
 
 export default {
@@ -272,4 +322,5 @@ ${q.flag}
 ╰━━━━━━━━━━━━━━━`
     }, { quoted: msg });
   }
-}; 
+};
+  
