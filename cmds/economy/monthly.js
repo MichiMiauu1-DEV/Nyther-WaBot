@@ -9,7 +9,14 @@ export default {
     
     // Verificación de estado económico
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -28,7 +35,11 @@ export default {
     // Verificación de tiempo restante
     if (now < user.lastmonthly) {
       const wait = formatTime(Math.floor((user.lastmonthly - now) / 1000));
-      return sock.sendMessage(msg.chat, { text: `《✧》 ¡PACIENCIA, ACROBATA! Ya has reclamado tus suministros mensuales. La gerencia te pide que esperes *${wait}* para el siguiente ciclo.` }, { quoted: msg });
+      return sock.sendMessage(msg.chat, { text: `╭━━━〔 ⏳ 𝙋𝘼𝘾𝙄𝙀𝙉𝘾𝙄𝘼 〕━━━⬣
+
+¡PACIENCIA, ACROBATA! Ya has reclamado tus suministros mensuales. La gerencia te pide que esperes *${wait}* para el siguiente ciclo.
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
     }
     
     let currentStreak = users.monthlyStreak;
@@ -55,7 +66,14 @@ export default {
     
     if (lost) caption += `\n> ⚠️ ¡Oh, no! La racha mensual se ha reiniciado. ¡Mantente atento el próximo mes!`;    
     
-    await sock.sendMessage(msg.chat, { text: `*《✧》 ¡FELICIDADES POR TU LEALTAD AL CIRCO!* \`🎪\`\n\nHas reclamado tu recompensa mensual: *+¥${coins.toLocaleString()} ${currency}* (Mes *${currentStreak}*)\n${caption}` }, { quoted: msg });
+    await sock.sendMessage(msg.chat, { text: `╭━━━〔 🎪 𝙍𝙀𝘾𝙊𝙈𝙋𝙀𝙉𝙎𝘼 𝙈𝙀𝙉𝙎𝙐𝘼𝙇 〕━━━⬣
+
+¡FELICIDADES POR TU LEALTAD AL CIRCO! 🎪
+
+Has reclamado tu recompensa mensual: *+¥${coins.toLocaleString()} ${currency}* (Mes *${currentStreak}*)
+${caption}
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
   }
 };
 
