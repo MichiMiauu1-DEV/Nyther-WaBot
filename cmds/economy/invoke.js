@@ -9,7 +9,14 @@ export default {
     
     // Verificación de estado del sistema
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const botId = sock?.user?.id.split(':')[0] + '@s.whatsapp.net';
@@ -26,16 +33,33 @@ export default {
     
     // Verificación de recursos vitales
     if (user.stamina < 10 || user.magic < 10 || user.health < 10) {
-      return msg.reply(`《✧》 ¡TU CUERPO NO AGUANTA MÁS! Un ritual requiere estabilidad total.\n> Verifica tu *Stamina, Magia y Salud* (Mínimo 10 en cada uno).\n> Usa *${usedPrefix}heal* o *${usedPrefix}pocion* para estabilizarte.`);
+      return msg.reply(`╭━━━〔 ⚠️ 𝙎𝙏𝘼𝙏𝙎 𝘽𝘼𝙅𝙊𝙎 〕━━━⬣
+
+¡TU CUERPO NO AGUANTA MÁS! Un ritual requiere estabilidad total.
+
+> Verifica tu *Stamina, Magia y Salud* (Mínimo 10 en cada uno).
+> Usa *${usedPrefix}heal* o *${usedPrefix}pocion* para estabilizarte.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (!user.inventory?.totem || user.inventory.totem <= 0) {
-      return msg.reply(`《✧》 ¡NO TIENES TÓTEM! ¿Cómo pretendes estabilizar el vacío sin un conductor?\n> Compra uno en la tienda con: *${usedPrefix}buy totem*`);
+      return msg.reply(`╭━━━〔 🔮 𝙁𝘼𝙇𝙏𝘼 𝙏𝙊𝙏𝙀𝙈 〕━━━⬣
+
+¡NO TIENES TÓTEM! ¿Cómo pretendes estabilizar el vacío sin un conductor?
+
+> Compra uno en la tienda con: *${usedPrefix}buy totem*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const remaining = user.lastinvoke - Date.now();
     if (remaining > 0) {
-      return msg.reply(`《✧》 ¡EL PORTAL ESTÁ INESTABLE! Debes esperar *${msToTime(remaining)}* para volver a canalizar energía.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙋𝙊𝙍𝙏𝘼𝙇 𝙄𝙉𝙀𝙎𝙏𝘼𝘽𝙇𝙀 〕━━━⬣
+
+¡EL PORTAL ESTÁ INESTABLE! Debes esperar *${msToTime(remaining)}* para volver a canalizar energía.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     // Consumo de recursos
@@ -60,23 +84,28 @@ export default {
     
     if (roll < 0.05) {
       reward = Math.floor(Math.random() * (13000 - 11000 + 1)) + 11000;
-      narration = `*《✧》 ¡GLITCH LEGENDARIO!* ${pickRandom(legendaryInvocations)}`;
-      bonusMsg = '\nꕥ ¡RECOMPENSA ÉPICA OBTENIDA!';
+      narration = `¡GLITCH LEGENDARIO! ${pickRandom(legendaryInvocations)}`;
+      bonusMsg = '\n¡RECOMPENSA ÉPICA OBTENIDA!';
     } else {
       reward = Math.floor(Math.random() * (11000 - 8000 + 1)) + 8000;
-      narration = `《✧》 ${pickRandom(normalInvocations)}`;
+      narration = `${pickRandom(normalInvocations)}`;
       if (Math.random() < 0.15) {
         const bonus = Math.floor(Math.random() * (4500 - 2500 + 1)) + 2500;
         reward += bonus;
-        bonusMsg = `\n「✿」 ¡ENERGÍA ARBITRARIA! Ganaste *+${bonus.toLocaleString()} ${monedas}* adicionales.`;
+        bonusMsg = `\n¡ENERGÍA ARBITRARIA! Ganaste *+${bonus.toLocaleString()} ${monedas}* adicionales.`;
       }
     }    
     
     user.coins += reward;
     db.setChatUser(msg.chat, msg.sender, 'coins', user.coins);    
     
-    let caption = `${narration}\n\n> 💰 Ganaste: *${reward.toLocaleString()} ${monedas}*`;
-    if (bonusMsg) caption += `${bonusMsg}`;
+    let caption = `╭━━━〔 🌀 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝙍𝙄𝙏𝙐𝘼𝙇 〕━━━⬣
+
+${narration}
+
+> 💰 Ganaste: *${reward.toLocaleString()} ${monedas}*${bonusMsg}
+
+╰━━━━━━━━━━━━━━━`;
     
     await sock.sendMessage(msg.chat, { text: caption }, { quoted: msg });
   }
