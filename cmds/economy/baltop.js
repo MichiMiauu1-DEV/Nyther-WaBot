@@ -10,7 +10,14 @@ export default {
     
     // Verificación de estado del sistema
     if (chatData.adminonly || !chatData.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -30,7 +37,11 @@ export default {
       }      
       
       if (users.length === 0) {
-        return msg.reply(`《✧》 ¡VAYA! Nadie aquí tiene suficiente capital para entrar en la lista de los magnates. ¡Toca esforzarse más!`);
+        return msg.reply(`╭━━━〔 💸 𝙈𝘼𝙂𝙉𝘼𝙏𝙀𝙎 𝘼𝙐𝙎𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
+
+¡VAYA! Nadie aquí tiene suficiente capital para entrar en la lista de los magnates. ¡Toca esforzarse más!
+
+╰━━━━━━━━━━━━━━━`);
       }      
       
       const sorted = users.sort((a, b) => ((b.coins || 0) + (b.bank || 0)) - ((a.coins || 0) + (a.bank || 0)));
@@ -39,28 +50,38 @@ export default {
       const totalPages = Math.ceil(sorted.length / pageSize);      
       
       if (isNaN(page) || page < 1 || page > totalPages) {
-        return msg.reply(`《✧》 ¡ERROR DE ESCENARIO! La página *${page}* no existe. Solo tenemos *${totalPages}* páginas de pura riqueza.`);
+        return msg.reply(`╭━━━〔 🛑 𝙀𝙍𝙍𝙊𝙍 𝘿𝙀 𝙀𝙎𝘾𝙀𝙉𝘼𝙍𝙄𝙊 〕━━━⬣
+
+La página *${page}* no existe. Solo tenemos *${totalPages}* páginas de pura riqueza.
+
+╰━━━━━━━━━━━━━━━`);
       }      
       
       const start = (page - 1) * pageSize;
       const end = start + pageSize;      
       
-      let text = `*《✧》 RANKING DE MAGNATES DEL CIRCO* \`🎪\`\n\n`;
-      text += sorted.slice(start, end).map(({ name, coins, bank }, i) => {
+      let mensaje = `╭━━━〔 🎪 𝙍𝘼𝙉𝙆𝙄𝙉𝙂 𝘿𝙀 𝙈𝘼𝙂𝙉𝘼𝙏𝙀𝙎 〕━━━⬣\n\n`;
+      mensaje += sorted.slice(start, end).map(({ name, coins, bank }, i) => {
         const total = (coins || 0) + (bank || 0);
-        return `» *${start + i + 1}*. ${name}\n   └ Total › *¥${total.toLocaleString()} ${monedas}*`;
+        return `ⴵ *${start + i + 1}*. ${name}\n   └ Total ➜ *¥${total.toLocaleString()} ${monedas}*`;
       }).join('\n\n');      
       
-      text += `\n\n──────────────────────\n> ⌦ Página *${page}* de *${totalPages}*`;
+      mensaje += `\n\n╰━━━━━━━━━━━━━━━\n\n> ⌦ Página *${page}* de *${totalPages}*`;
       
       if (page < totalPages) {
-        text += `\n> Para ver más fortunas › *${usedPrefix + command} ${page + 1}*`;
+        mensaje += `\n> Para ver más fortunas ➜ *${usedPrefix + command} ${page + 1}*`;
       }      
       
-      await sock.sendMessage(chatId, { text }, { quoted: msg });
+      await sock.sendMessage(chatId, { text: mensaje }, { quoted: msg });
       
     } catch (e) {
-      await msg.reply(`《✧》 ¡SANTOS GLITCHES! Ha ocurrido un error inesperado al renderizar la tabla.\n> Error: *${e.message}*`);
+      await msg.reply(`╭━━━〔 ⚠️ 𝙀𝙍𝙍𝙊𝙍 𝘿𝙀 𝙎𝙄𝙎𝙏𝙀𝙈𝘼 〕━━━⬣
+
+¡SANTOS GLITCHES! Ha ocurrido un error inesperado al renderizar la tabla.
+
+> Error: *${e.message}*
+
+╰━━━━━━━━━━━━━━━`);
     }
   }
 };
