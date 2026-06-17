@@ -13,20 +13,37 @@ export default {
     // Verificación de estado económico
     const chatData = db.getChat(chatId);
     if (chatData.adminonly || !chatData.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     // Identificación del receptor
     const who = msg.quoted?.sender || msg.mentionedJid?.[0] || (args[1] ? (args[1].replace(/[@ .+-]/g, '') + '@s.whatsapp.net') : null);
     if (!who) {
-      return msg.reply(`《✧》 ¡ERROR DE LOGÍSTICA! Debes mencionar al acróbata al que deseas transferir *${monedas}*.\n> Ejemplo » *${usedPrefix + command} 25000 @mencion*`);
+      return msg.reply(`╭━━━〔 ⚠️ 𝙀𝙍𝙍𝙊𝙍 𝘿𝙀 𝙇𝙊𝙂𝙄𝙎𝙏𝙄𝘾𝘼 〕━━━⬣
+
+Debes mencionar al acróbata al que deseas transferir *${monedas}*.
+
+> Ejemplo ➜ *${usedPrefix + command} 25000 @mencion*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const senderData = db.getChatUser(chatId, msg.sender);
     const targetData = db.getChatUser(chatId, who);   
     
     if (!targetData) {
-      return msg.reply(`《✧》 ¡ACRÓBATA DESCONOCIDO! El usuario mencionado no está registrado en los archivos del Circo.`);
+      return msg.reply(`╭━━━〔 👤 𝘼𝘾𝙍𝙊́𝘽𝘼𝙏𝘼 𝘿𝙀𝙎𝘾𝙊𝙉𝙊𝘾𝙄𝘿𝙊 〕━━━⬣
+
+El usuario mencionado no está registrado en los archivos del Circo.
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     // Validación de cantidad
@@ -34,11 +51,21 @@ export default {
     let cantidad = cantidadInput === 'all' ? (senderData.bank || 0) : parseInt(cantidadInput);
     
     if (!cantidadInput || isNaN(cantidad) || cantidad <= 0) {
-      return msg.reply(`《✧》 ¡CANTIDAD ILEGAL! Ingresa una cifra válida de *${monedas}* para transferir.`);
+      return msg.reply(`╭━━━〔 🛑 𝘾𝘼𝙉𝙏𝙄𝘿𝘼𝘿 𝙄𝙇𝙀𝙂𝘼𝙇 〕━━━⬣
+
+Ingresa una cifra válida de *${monedas}* para transferir.
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     if ((senderData.bank || 0) < cantidad) {
-      return msg.reply(`《✧》 ¡FONDOS INSUFICIENTES! Tu banco está más vacío que una carpa sin show.\n> Saldo actual: *¥${(senderData.bank || 0).toLocaleString()} ${monedas}*`);
+      return msg.reply(`╭━━━〔 💸 𝙁𝙊𝙉调𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
+
+Tu banco está más vacío que una carpa sin show.
+
+> Saldo actual: *¥${(senderData.bank || 0).toLocaleString()} ${monedas}*
+
+╰━━━━━━━━━━━━━━━`);
     }          
     
     // Ejecución de la transferencia
@@ -49,7 +76,14 @@ export default {
     let name = userData?.name || who.split('@')[0];
     
     await sock.sendMessage(chatId, { 
-      text: `《✧》 ¡TRANSFERENCIA EXITOSA! 🎪\n\n> Has enviado *¥${cantidad.toLocaleString()} ${monedas}* a *${name}*.\n> Tu nuevo saldo bancario: *¥${((senderData.bank || 0) - cantidad).toLocaleString()} ${monedas}*`, 
+      text: `╭━━━〔 💸 𝙏𝙍𝘼𝙉𝙎𝙁𝙀𝙍𝙀𝙉𝘾𝙄𝘼 𝙀𝙓𝙄𝙏𝙊𝙎𝘼 〕━━━⬣
+
+¡TRANSFERENCIA EXITOSA! 🎪
+
+> Has enviado *¥${cantidad.toLocaleString()} ${monedas}* a *${name}*.
+> Tu nuevo saldo bancario: *¥${((senderData.bank || 0) - cantidad).toLocaleString()} ${monedas}*
+
+╰━━━━━━━━━━━━━━━`, 
       mentions: [who] 
     }, { quoted: msg });
   }
