@@ -7,7 +7,14 @@ export default {
   run: async ({ msg, sock, usedPrefix, text }) => {
     const chat = db.getChat(msg.chat);
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -24,22 +31,44 @@ export default {
     
     const staminaConsumed = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
     if (user.stamina < staminaConsumed) {
-      return msg.reply(`《✧》 ¡ESTÁS AGOTADO! Necesitas descansar antes de ir al lago.\n> Usa *${usedPrefix}heal* para recuperar energía.`);
+      return msg.reply(`╭━━━〔 ⚡ 𝙀𝙎𝙏𝘼́𝙎 𝘼𝙂𝙊𝙏𝘼𝘿𝙊 〕━━━⬣
+
+¡ESTÁS AGOTADO! Necesitas descansar antes de ir al lago.
+
+> Usa *${usedPrefix}heal* para recuperar energía.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (!user.tools?.caña) {
-      return msg.reply(`《✧》 ¡NO TIENES CAÑA! ¿Cómo piensas pescar en este caos digital?\n> Compra una en la tienda: *${usedPrefix}buy caña*`);
+      return msg.reply(`╭━━━〔 🎣 𝙁𝘼𝙇𝙏𝘼 𝘾𝘼𝙉̃𝘼 〕━━━⬣
+
+¡NO TIENES CAÑA! ¿Cómo piensas pescar en este caos digital?
+
+> Compra una en la tienda: *${usedPrefix}buy caña*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (user.tools.caña.durability <= 10) {
       delete user.tools.caña;
       db.setChatUser(msg.chat, msg.sender, 'tools', user.tools);
-      return msg.reply(`《✧》 ¡CRASH! Tu caña se ha roto por el uso intensivo.\n> Compra una nueva: *${usedPrefix}buy caña*`);
+      return msg.reply(`╭━━━〔 🛠️ 𝘾𝘼𝙉̃𝘼 𝙍𝙊𝙏𝘼 〕━━━⬣
+
+¡CRASH! Tu caña se ha roto por el uso intensivo.
+
+> Compra una nueva: *${usedPrefix}buy caña*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const remainingTime = user.lastfish - Date.now();
     if (remainingTime > 0) {
-      return msg.reply(`《✧》 ¡LOS PECES SE ESTÁN OCULTANDO! Debes esperar *${msToTime(remainingTime)}* para volver a lanzar el anzuelo.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙋𝙀𝘾𝙀𝙎 𝙊𝘾𝙐𝙇𝙏𝙊𝙎 〕━━━⬣
+
+¡LOS PECES SE ESTÁN OCULTANDO! Debes esperar *${msToTime(remainingTime)}* para volver a lanzar el anzuelo.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     user.stamina -= staminaConsumed;
@@ -96,7 +125,11 @@ export default {
     }    
     
     db.setChatUser(msg.chat, msg.sender, 'lastfish', Date.now() + 8 * 60 * 1000);
-    await sock.sendMessage(msg.chat, { text: `*《✧》 RESULTADO DE PESCA* 🎣\n\n${message}` }, { quoted: msg });
+    await sock.sendMessage(msg.chat, { text: `╭━━━〔 🎣 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝘿𝙀 𝙋𝙀𝙎𝘾𝘼 〕━━━⬣
+
+${message}
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
   }
 };
 
@@ -141,3 +174,4 @@ const neutralMessages = [
   'Los peces observaron tu anzuelo con sospecha, nadie picó hoy.',
   'Exploraste una zona nueva del lago, pero solo encontraste burbujas de datos.'
 ];
+                             
