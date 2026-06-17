@@ -24,7 +24,14 @@ export default {
     const chatData = db.getChat(chatId);
     
     if (chatData.adminonly || !chatData.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }    
         
     // Inicialización de registros
@@ -56,23 +63,28 @@ export default {
     const coins = user.coins || 0;
     const name = users?.name || msg.sender.split('@')[0];
     
-    const mensaje = `*《✧》 ESTADO DEL ACRÓBATA* 🎪\n\n` +
-      `Usuario: *<${name}>*\n\n` +
-      `ⴵ Work » *${formatTime(cooldowns.work)}*\n` +
-      `ⴵ Slut » *${formatTime(cooldowns.slut)}*\n` +
-      `ⴵ Crime » *${formatTime(cooldowns.crime)}*\n` +
-      `ⴵ Mine » *${formatTime(cooldowns.mine)}*\n` +
-      `ⴵ Ritual » *${formatTime(cooldowns.ritual)}*\n` +
-      `ⴵ Fish » *${formatTime(cooldowns.fish)}*\n` +
-      `ⴵ Hunt » *${formatTime(cooldowns.hunt)}*\n` +
-      `ⴵ Dungeon » *${formatTime(cooldowns.dungeon)}*\n` +
-      `ⴵ Adventure » *${formatTime(cooldowns.adventure)}*\n` +
-      `ⴵ Steal » *${formatTime(cooldowns.steal)}*\n` +
-      `ⴵ Daily » *${formatTime(cooldowns.daily)}*\n` +
-      `ⴵ Coffer » *${formatTime(cooldowns.coffer)}*\n` +
-      `ⴵ Weekly » *${formatTime(cooldowns.weekly)}*\n` +
-      `ⴵ Monthly » *${formatTime(cooldowns.monthly)}*\n\n` +
-      `⛁ *Saldo Total:* ¥${coins.toLocaleString()} ${settings.currency || 'Coins'}`;
+    const mensaje = `╭━━━〔 🎪 𝙀𝙎𝙏𝘼𝘿𝙊 𝘿𝙀𝙇 𝘼𝘾𝙍𝙊́𝘽𝘼𝙏𝘼 〕━━━⬣
+
+Usuario: *<${name}>*
+
+ⴵ Work ➜ *${formatTime(cooldowns.work)}*
+ⴵ Slut ➜ *${formatTime(cooldowns.slut)}*
+ⴵ Crime ➜ *${formatTime(cooldowns.crime)}*
+ⴵ Mine ➜ *${formatTime(cooldowns.mine)}*
+ⴵ Ritual ➜ *${formatTime(cooldowns.ritual)}*
+ⴵ Fish ➜ *${formatTime(cooldowns.fish)}*
+ⴵ Hunt ➜ *${formatTime(cooldowns.hunt)}*
+ⴵ Dungeon ➜ *${formatTime(cooldowns.dungeon)}*
+ⴵ Adventure ➜ *${formatTime(cooldowns.adventure)}*
+ⴵ Steal ➜ *${formatTime(cooldowns.steal)}*
+ⴵ Daily ➜ *${formatTime(cooldowns.daily)}*
+ⴵ Coffer ➜ *${formatTime(cooldowns.coffer)}*
+ⴵ Weekly ➜ *${formatTime(cooldowns.weekly)}*
+ⴵ Monthly ➜ *${formatTime(cooldowns.monthly)}*
+
+⛁ *Saldo Total:* ¥${coins.toLocaleString()} ${settings.currency || 'Coins'}
+
+╰━━━━━━━━━━━━━━━`;
       
     await sock.sendMessage(chatId, { text: mensaje }, { quoted: msg });
   }
