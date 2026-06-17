@@ -8,7 +8,14 @@ export default {
     const chat = db.getChat(msg.chat);
     
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -27,7 +34,13 @@ export default {
     
     if (now < user.lastdaily) {
       const restante = formatRemainingTime(user.lastdaily - now);
-      return msg.reply(`《✧》 ¡PACIENCIA, ACROBATA! Ya has reclamado tus suministros de hoy. La gerencia te pide que esperes *${restante}* para el siguiente ciclo.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝘾𝙄𝘾𝙇𝙊 𝙀𝙉 𝙀𝙎𝙋𝙀𝙍𝘼 〕━━━⬣
+
+¡PACIENCIA, ACRÓBATA! Ya has reclamado tus suministros de hoy. 
+
+La gerencia te pide que esperes *${restante}* para el siguiente ciclo.
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     let currentStreak = users.streak;
@@ -50,11 +63,16 @@ export default {
     db.setChatUser(msg.chat, msg.sender, 'lastdaily', now + oneDay);
     
     const siguiente = Math.min(20000 + currentStreak * 5000, 1015000).toLocaleString();
-    let caption = `\n──────────────────────\n» Siguiente premio (Día ${currentStreak + 1}) › *¥${siguiente} ${monedas}*`;
+    let footer = `\n\nⴵ Siguiente premio (Día ${currentStreak + 1}) ➜ *¥${siguiente} ${monedas}*`;
     
-    if (lost) caption += `\n> ⚠️ ¡Oh, no! La racha se ha reiniciado por falta de asistencia. ¡A empezar de nuevo!`;
+    if (lost) footer += `\n\n> ⚠️ ¡Oh, no! La racha se ha reiniciado por falta de asistencia. ¡A empezar de nuevo!`;
     
-    await msg.reply(`*《✧》 ¡BIENVENIDO A TU DÍA ${currentStreak} EN EL CIRCO!* \`🎪\`\n\nHas recibido una recompensa por tu lealtad: *¥${recompensa.toLocaleString()} ${monedas}*!${caption}`);
+    await msg.reply(`╭━━━〔 🎪 𝘿𝙄́𝘼 ${currentStreak} 𝙀𝙉 𝙀𝙇 𝘾𝙄𝙍𝘾𝙊 〕━━━⬣
+
+Has recibido una recompensa por tu lealtad: 
+*¥${recompensa.toLocaleString()} ${monedas}*!${footer}
+
+╰━━━━━━━━━━━━━━━`);
   }
 };
 
