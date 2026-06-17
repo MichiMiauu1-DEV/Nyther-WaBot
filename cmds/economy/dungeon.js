@@ -9,7 +9,14 @@ export default {
     
     // Verificación de estado del sistema
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }    
 
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -26,7 +33,13 @@ export default {
     
     const staminaConsumed = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
     if (user.stamina < staminaConsumed) {
-      return msg.reply(`《✧》 ¡ESTÁS AGOTADO! No tienes suficiente stamina para enfrentarte a los horrores de la mazmorra.\n> ✐ Usa *${usedPrefix}heal* para recargar tus energías.`);
+      return msg.reply(`╭━━━〔 ⚡ 𝙀𝙎𝙏𝘼́𝙎 𝘼𝙂𝙊𝙏𝘼𝘿𝙊 〕━━━⬣
+
+¡No tienes suficiente stamina para enfrentarte a los horrores de la mazmorra!
+
+> ✐ Usa *${usedPrefix}heal* para recargar tus energías.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     let usingMagic = false;
@@ -36,13 +49,25 @@ export default {
       if (user.weapons.hacha.durability <= 10) {
         delete user.weapons.hacha;
         db.setChatUser(msg.chat, msg.sender, 'weapons', user.weapons);
-        return msg.reply(`《✧》 ¡CRACK! Tu Hacha se ha hecho pedazos por el uso extremo y ha sido eliminada. ¡Compra una nueva en la tienda con *${usedPrefix}buy hacha*!`);
+        return msg.reply(`╭━━━〔 🛠️ 𝘼𝙍𝙈𝘼 𝙍𝙊𝙏𝘼 〕━━━⬣
+
+¡CRACK! Tu Hacha se ha hecho pedazos por el uso extremo y ha sido eliminada. 
+
+¡Compra una nueva en la tienda con *${usedPrefix}buy hacha*!
+
+╰━━━━━━━━━━━━━━━`);
       }
       usingWeapon = true;
     } else {
       const magicConsumed = Math.floor(Math.random() * (12 - 1 + 1)) + 1;
       if (user.magic < magicConsumed) {
-        return msg.reply(`《✧》 ¡MAGIA AGOTADA! No tienes arma equipada y tu esencia mágica está seca.\n> ✐ Compra un arma con *${usedPrefix}buy hacha* o recupérate.`);
+        return msg.reply(`╭━━━〔 ✨ 𝙈𝘼𝙂𝙄𝘼 𝘼𝙂𝙊𝙏𝘼𝘿𝘼 〕━━━⬣
+
+No tienes arma equipada y tu esencia mágica está seca.
+
+> ✐ Compra un arma con *${usedPrefix}buy hacha* o recupérate.
+
+╰━━━━━━━━━━━━━━━`);
       }
       usingMagic = true;
       user.magic -= magicConsumed;
@@ -50,12 +75,23 @@ export default {
     }    
     
     if (user.health < 5) {
-      return msg.reply(`《✧》 ¡CUIDADO! Tu salud es demasiado baja para arriesgarte en la mazmorra.\n> ✐ Usa *${usedPrefix}heal* antes de que te conviertas en un error de sistema.`);
+      return msg.reply(`╭━━━〔 ⚕️ 𝙎𝘼𝙇𝙐𝘿 𝘾𝙍𝙄́𝙏𝙄𝘾𝘼 〕━━━⬣
+
+¡CUIDADO! Tu salud es demasiado baja para arriesgarte en la mazmorra.
+
+> ✐ Usa *${usedPrefix}heal* antes de que te conviertas en un error de sistema.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (Date.now() < user.lastdungeon) {
       const restante = user.lastdungeon - Date.now();
-      return msg.reply(`《✧》 ¡MÁS DESPACIO! La mazmorra se está reorganizando. Espera *${msToTime(restante)}* para volver a entrar.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙈𝘼𝙕𝙈𝙊𝙍𝙍𝘼 𝙍𝙀𝙊𝙍𝙂𝘼𝙉𝙄𝙕𝘼́𝙉𝘿𝙊𝙎𝙀 〕━━━⬣
+
+¡MÁS DESPACIO! La mazmorra se está reorganizando. 
+Espera *${msToTime(restante)}* para volver a entrar.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     user.stamina -= staminaConsumed;
@@ -67,9 +103,7 @@ export default {
     let durabilityConsumed = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
     let message;    
     
-    // ==========================================
-    // ESCENARIO: VICTORIA (40% Probabilidad)
-    // ==========================================
+    // VICTORIA
     if (rand < 0.4) {
       if (usingWeapon) {
         user.weapons.hacha.durability -= durabilityConsumed;
@@ -93,9 +127,7 @@ export default {
       ];
       message = pickRandom(successMessages);
 
-    // ==========================================
-    // ESCENARIO: FRACASO (30% Probabilidad)
-    // ==========================================
+    // FRACASO
     } else if (rand < 0.7) {
       if (usingWeapon) {
         user.weapons.hacha.durability -= durabilityConsumed;
@@ -147,7 +179,11 @@ export default {
     }    
     
     db.setChatUser(msg.chat, msg.sender, 'lastdungeon', Date.now() + 17 * 60 * 1000);
-    await sock.sendMessage(msg.chat, { text: `《✧》 ${message}` }, { quoted: msg });
+    await sock.sendMessage(msg.chat, { text: `╭━━━〔 🏰 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝘿𝙀 𝙈𝘼𝙕𝙈𝙊𝙍𝙍𝘼 〕━━━⬣
+
+${message}
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
   }
 };
 
