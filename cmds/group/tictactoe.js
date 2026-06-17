@@ -37,6 +37,8 @@ export default {
         db.setChatUser(chat, userId, 'ticStreak', 0);
         user = db.getChatUser(chat, userId);
     }
+    // Asegurar que ticStreak exista en el objeto user local para evitar errores
+    if (user.ticStreak === undefined) user.ticStreak = 0;
 
     const normalize = (t) => (t || "").toLowerCase().trim();
 
@@ -106,14 +108,20 @@ export default {
     if (checkWin(board, symbol)) {
       const prize = g.bet * 2;
       let uWin = db.getChatUser(chat, userId);
+      // Validar streak del ganador antes de sumar
+      if (uWin.ticStreak === undefined) uWin.ticStreak = 0;
+      
       db.setChatUser(chat, userId, 'coins', (uWin.coins || 0) + prize);
       
       if (g.type === "game") {
         const loserId = userId === g.player1 ? g.player2 : g.player1;
         let uLose = db.getChatUser(chat, loserId);
+        if (uLose && uLose.ticStreak === undefined) uLose.ticStreak = 0;
+        
         const h1 = (uWin.achievements || []).some(a => a.id === "tic_streak_15");
         const h2 = (uWin.achievements || []).some(a => a.id === "tic_legend_100");
         const l1 = (uLose.achievements || []).some(a => a.id === "tic_streak_15");
+        
         if (!l1) db.setChatUser(chat, loserId, 'ticStreak', 0);
         db.setChatUser(chat, userId, 'ticStreak', (uWin.ticStreak || 0) + 1);
         let newStreak = (uWin.ticStreak || 0) + 1;
@@ -164,3 +172,4 @@ export default {
     sock.sendMessage(chat, { text: `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${drawBoard(board)}\n\n🎯 Turno: @${g.turn.split('@')[0]} (${nextSymbol})\n╰━━━━━━━━━━━━━━━`, mentions: [g.turn] }, { quoted: msg });
   }
 };
+                       
