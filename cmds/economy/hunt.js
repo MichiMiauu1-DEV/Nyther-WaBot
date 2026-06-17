@@ -9,7 +9,14 @@ export default {
     
     // Verificación de estado económico
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -26,22 +33,44 @@ export default {
     
     const staminaConsumed = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
     if (user.stamina < staminaConsumed) {
-      return msg.reply(`《✧》 ¡ESTÁS AGOTADO! Necesitas descansar antes de ir a cazar.\n> Usa *${usedPrefix}heal* para recuperar energía.`);
+      return msg.reply(`╭━━━〔 ⚡ 𝙀𝙎𝙏𝘼́𝙎 𝘼𝙂𝙊𝙏𝘼𝘿𝙊 〕━━━⬣
+
+¡ESTÁS AGOTADO! Necesitas descansar antes de ir a cazar.
+
+> Usa *${usedPrefix}heal* para recuperar energía.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (!user.weapons?.arco) {
-      return msg.reply(`《✧》 ¡NO TIENES ARCO! ¿Cómo pretendes cazar con las manos?\n> Compra uno en la tienda con: *${usedPrefix}buy arco*`);
+      return msg.reply(`╭━━━〔 🏹 𝙁𝘼𝙇𝙏𝘼 𝘼𝙍𝘾𝙊 〕━━━⬣
+
+¡NO TIENES ARCO! ¿Cómo pretendes cazar con las manos?
+
+> Compra uno en la tienda con: *${usedPrefix}buy arco*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (user.weapons.arco.durability <= 10) {
       delete user.weapons.arco;
       db.setChatUser(msg.chat, msg.sender, 'weapons', user.weapons);
-      return msg.reply(`《✧》 ¡CRASH! Tu arco se ha hecho añicos. ¡Ya no sirve de nada!\n> Compra uno nuevo con: *${usedPrefix}buy arco*`);
+      return msg.reply(`╭━━━〔 🛠️ 𝘼𝙍𝘾𝙊 𝙍𝙊𝙏𝙊 〕━━━⬣
+
+¡CRASH! Tu arco se ha hecho añicos. ¡Ya no sirve de nada!
+
+> Compra uno nuevo con: *${usedPrefix}buy arco*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     if (Date.now() < user.lasthunt) {
       const restante = user.lasthunt - Date.now();
-      return msg.reply(`《✧》 ¡LAS PRESAS SE ESTÁN ESCONDIENDO! Espera *${msToTime(restante)}* para volver a cazar.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙋𝙍𝙀𝙎𝘼𝙎 𝙀𝙎𝘾𝙊𝙉𝘿𝙄𝘿𝘼𝙎 〕━━━⬣
+
+¡LAS PRESAS SE ESTÁN ESCONDIENDO! Espera *${msToTime(restante)}* para volver a cazar.
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     user.stamina -= staminaConsumed;
@@ -100,7 +129,11 @@ export default {
     }
     
     db.setChatUser(msg.chat, msg.sender, 'lasthunt', Date.now() + 15 * 60 * 1000);
-    await sock.sendMessage(msg.chat, { text: `*《✧》 RESULTADO DE CAZA* 🏹\n\n${message}` }, { quoted: msg });
+    await sock.sendMessage(msg.chat, { text: `╭━━━〔 🏹 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝘿𝙀 𝘾𝘼𝙕𝘼 〕━━━⬣
+
+${message}
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
   }
 };
 
@@ -145,3 +178,4 @@ const neutralMessages = [
   'Las criaturas fueron cautelosas, pero la experiencia de caza fue agradable.',
   'Exploraste nuevas rutas y descubriste huellas frescas de algo que no lograste ver.'
 ];
+                               
