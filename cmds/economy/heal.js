@@ -7,7 +7,14 @@ export default {
   run: async ({ msg, sock, usedPrefix, command }) => {
     const chatData = db.getChat(msg.chat);
     if (chatData.adminonly || !chatData.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -24,7 +31,11 @@ export default {
     
     if (who) {
       target = db.getChatUser(msg.chat, who);
-      if (!target) return msg.reply(`《✧》 ¡ERROR DE REGISTRO! El usuario mencionado no está en nuestra base de datos circense.`);
+      if (!target) return msg.reply(`╭━━━〔 ⚠️ 𝙀𝙍𝙍𝙊𝙍 𝘿𝙀 𝙍𝙀𝙂𝙄𝙎𝙏𝙍𝙊 〕━━━⬣
+
+¡El usuario mencionado no está en nuestra base de datos circense!
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const targetUser = who ? db.getUser(who) : null;
@@ -33,14 +44,28 @@ export default {
     // Lógica de Pociones (Magia)
     if (cmd === 'pocion' || cmd === 'potion') {
       if (!healer.inventory?.pocion || healer.inventory.pocion <= 0) {
-        return msg.reply(`《✧》 ¡POCIÓN AGOTADA! No tienes el elixir necesario en tu inventario.\n> Compra una en la tienda: *${usedPrefix}shop*`);
+        return msg.reply(`╭━━━〔 🧪 𝙋𝙊𝘾𝙄𝙊́𝙉 𝘼𝙂𝙊𝙏𝘼𝘿𝘼 〕━━━⬣
+
+No tienes el elixir necesario en tu inventario.
+
+> Compra una en la tienda: *${usedPrefix}shop*
+
+╰━━━━━━━━━━━━━━━`);
       }      
       
       const magiaActual = target.magic || 0;
       const magiaFaltante = 100 - magiaActual;
       
       if (magiaFaltante <= 0) {
-        return msg.reply(who ? `《✧》 La magia de *${targetUser?.name || who.split('@')[0]}* ya está al máximo.` : `《✧》 Tu magia ya está al máximo (100/100).`);
+        return msg.reply(who ? `╭━━━〔 ✨ 𝙈𝘼𝙂𝙄𝘼 𝘼𝙇 𝙈𝘼́𝙓𝙄𝙈𝙊 〕━━━⬣
+
+La magia de *${targetUser?.name || who.split('@')[0]}* ya está al máximo.
+
+╰━━━━━━━━━━━━━━━` : `╭━━━〔 ✨ 𝙈𝘼𝙂𝙄𝘼 𝘼𝙇 𝙈𝘼́𝙓𝙄𝙈𝙊 〕━━━⬣
+
+Tu magia ya está al máximo (100/100).
+
+╰━━━━━━━━━━━━━━━`);
       }      
       
       healer.inventory.pocion -= 1;
@@ -51,7 +76,13 @@ export default {
       target.magic = magiaActual + magiaRestaurada;
       db.setChatUser(msg.chat, who || msg.sender, 'magic', target.magic);      
       
-      return msg.reply(`《✧》 ¡POCIÓN CONSUMIDA! Has restaurado *${magiaRestaurada}* puntos de magia.\n> Magia actual: *${target.magic}/100*`);
+      return msg.reply(`╭━━━〔 🧪 𝙀𝙇𝙄𝙓𝙄𝙍 𝘾𝙊𝙉𝙎𝙐𝙈𝙄𝘿𝙊 〕━━━⬣
+
+¡POCIÓN CONSUMIDA! Has restaurado *${magiaRestaurada}* puntos de magia.
+
+> Magia actual: *${target.magic}/100*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     // Lógica de Curación (Salud y Stamina)
@@ -61,7 +92,15 @@ export default {
     const faltanteStamina = 100 - staminaActual;
     
     if (saludActual >= 100 && staminaActual >= 100) {
-      return msg.reply(who ? `《✧》 *${targetUser?.name || who.split('@')[0]}* está en perfectas condiciones.` : `《✧》 ¡Ya estás al máximo de salud y stamina!`);
+      return msg.reply(who ? `╭━━━〔 ⚕️ 𝙎𝘼𝙇𝙐𝘿 𝙋𝙀𝙍𝙁𝙀𝘾𝙏𝘼 〕━━━⬣
+
+*${targetUser?.name || who.split('@')[0]}* está en perfectas condiciones.
+
+╰━━━━━━━━━━━━━━━` : `╭━━━〔 ⚕️ 𝙎𝘼𝙇𝙐𝘿 𝙋𝙀𝙍𝙁𝙀𝘾𝙏𝘼 〕━━━⬣
+
+¡Ya estás al máximo de salud y stamina!
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     const costoS = Math.ceil(faltanteSalud > 0 ? faltanteSalud / 10 : 0) * 500;
@@ -70,7 +109,13 @@ export default {
     const totalFondos = (healer.coins || 0) + (healer.bank || 0);    
     
     if (totalFondos < costoTotal) {
-      return msg.reply(`《✧》 ¡FONDOS INSUFICIENTES! La enfermería cobra por sus servicios.\n> Total necesario: *¥${costoTotal.toLocaleString()} ${currency}*`);
+      return msg.reply(`╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
+
+¡FONDOS INSUFICIENTES! La enfermería cobra por sus servicios.
+
+> Total necesario: *¥${costoTotal.toLocaleString()} ${currency}*
+
+╰━━━━━━━━━━━━━━━`);
     }    
     
     // Descontar fondos
@@ -89,7 +134,16 @@ export default {
     if (faltanteSalud > 0) { target.health = 100; db.setChatUser(msg.chat, who || msg.sender, 'health', 100); }
     if (faltanteStamina > 0) { target.stamina = 100; db.setChatUser(msg.chat, who || msg.sender, 'stamina', 100); }
     
-    const info = who ? `《✧》 Has curado a *${targetUser?.name || who.split('@')[0]}* hasta el máximo.` : `《✧》 ¡Te has curado hasta el máximo nivel!`;
-    msg.reply(`${info}\n\n> Salud actual: ${target.health}/100\n> Stamina actual: ${target.stamina}/100\n> Costo total: *¥${costoTotal.toLocaleString()} ${currency}*`);
+    const info = who ? `Has curado a *${targetUser?.name || who.split('@')[0]}* hasta el máximo.` : `¡Te has curado hasta el máximo nivel!`;
+    msg.reply(`╭━━━〔 🏥 𝙀𝙉𝙁𝙀𝙍𝙈𝙀𝙍𝙄́𝘼 𝘾𝙄𝙍𝘾𝙀𝙉𝙎𝙀 〕━━━⬣
+
+${info}
+
+> Salud actual: ${target.health}/100
+> Stamina actual: ${target.stamina}/100
+> Costo total: *¥${costoTotal.toLocaleString()} ${currency}*
+
+╰━━━━━━━━━━━━━━━`);
   }
 };
+  
