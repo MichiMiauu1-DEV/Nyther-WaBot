@@ -9,7 +9,14 @@ export default {
     
     // Si la economía está en mantenimiento
     if (chat.adminonly || !chat.economy) {
-      return msg.reply(`《✧》 ¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!\n\nDile a tu administrador que encienda los motores de la diversión con el comando:\n» *${usedPrefix}economy on*`);
+      return msg.reply(`╭━━━〔 🚫 𝙀𝘾𝙊𝙉𝙊𝙈𝙄𝘼 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝘼 〕━━━⬣
+
+¡RECHORCHOLIS! ¡La economía de nuestro maravilloso Circo Digital está clausurada en esta carpa!
+
+Dile a tu administrador que encienda los motores de la diversión con el comando:
+➜ *${usedPrefix}economy on*
+
+╰━━━━━━━━━━━━━━━`);
     }
 
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
@@ -20,7 +27,13 @@ export default {
     const remainingTime = user.lastcrime - Date.now();
     
     if (remainingTime > 0) {
-      return msg.reply(`《✧》 ¡ALTO AHÍ, MENTE CRIMINAL! Los sistemas de seguridad de la carpa te tienen bajo la mira. Espera *${msToTime(remainingTime)}* antes de planear otro golpe.`);
+      return msg.reply(`╭━━━〔 ⏳ 𝙎𝙄𝙎𝙏𝙀𝙈𝘼 𝘿𝙀 𝙎𝙀𝙂𝙐𝙍𝙄𝘿𝘼𝘿 〕━━━⬣
+
+¡ALTO AHÍ, MENTE CRIMINAL! Los sistemas de seguridad de la carpa te tienen bajo la mira. 
+
+Espera *${msToTime(remainingTime)}* antes de planear otro golpe.
+
+╰━━━━━━━━━━━━━━━`);
     }
 
     const éxito = Math.random() < 0.4;
@@ -50,9 +63,6 @@ export default {
     
     db.setChatUser(msg.chat, msg.sender, 'lastcrime', Date.now() + 7 * 60 * 1000);
 
-    // ==========================================
-    // HISTORIAS DE ÉXITO (40% Probabilidad)
-    // ==========================================
     const successMessages = [
       `¡Te infiltraste en el Reino de Caramelo y asaltaste un camión cargado de fudge de chocolate! Lograste venderlo en el mercado negro por *¥${cantidad.toLocaleString()} ${monedas}*.`,
       `¡Le robaste las llaves de la carpa trasera a Ragatha mientras estaba distraída y saqueaste la caja de utilería, ganando *¥${cantidad.toLocaleString()} ${monedas}*!`,
@@ -66,9 +76,6 @@ export default {
       `¡Rompiste un jarrón antiguo en los pasillos infinitos y para tu sorpresa estaba lleno de códigos de valor por *¥${cantidad.toLocaleString()} ${monedas}*!`
     ];
 
-    // ==========================================
-    // HISTORIAS DE FRACASO (60% Probabilidad)
-    // ==========================================
     const failMessages = [
       `¡Intentaste robarle un ojo flotante a Caine, pero sus dentaduras te descubrieron in fraganti! La multa del sistema te costó *¥${cantidad.toLocaleString()} ${monedas}*.`,
       `¡Trataste de asaltar la bóveda del Reino de Caramelo, pero la Reina Lulilalu te mandó a sus guardias de gominola! Perdiste *¥${cantidad.toLocaleString()} ${monedas}*.`,
@@ -81,7 +88,12 @@ export default {
     ];
 
     const message = éxito ? pickRandom(successMessages) : pickRandom(failMessages);
-    await sock.sendMessage(msg.chat, { text: `《✧》 ${message}` }, { quoted: msg });
+    
+    await sock.sendMessage(msg.chat, { text: `╭━━━〔 🎭 𝙍𝙀𝙎𝙐𝙇𝙏𝘼𝘿𝙊 𝘿𝙀𝙇 𝘾𝙍𝙄𝙈𝙀𝙉 〕━━━⬣
+
+${message}
+
+╰━━━━━━━━━━━━━━━` }, { quoted: msg });
   }
 };
 
