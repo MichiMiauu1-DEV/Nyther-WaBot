@@ -13,6 +13,11 @@ function getBestMove(board) {
   return available[Math.floor(Math.random() * available.length)];
 }
 
+function drawBoard(board) {
+  const b = board.map((v, i) => v ? v : (i + 1) + "️⃣");
+  return `${b[0]} ${b[1]} ${b[2]}\n${b[3]} ${b[4]} ${b[5]}\n${b[6]} ${b[7]} ${b[8]}`;
+}
+
 export default {
   command: ['tic'],
   category: 'game',
@@ -21,12 +26,10 @@ export default {
     const chat = msg.chat;
     const userId = msg.sender;
 
-    // Inicialización de DB de juegos si no existe
     if (!global.db.games) global.db.games = {};
     if (!global.db.games.tic) global.db.games.tic = {};
     const g = global.db.games.tic[chat];
 
-    // Asegurar que el usuario existe en la DB del chat
     let user = db.getChatUser(chat, userId);
     if (!user) {
         db.setChatUser(chat, userId, 'coins', 0);
@@ -44,8 +47,10 @@ export default {
       if ((user.coins || 0) < bet) return sock.reply(chat, "╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣\n\nNo tienes suficientes digitales.\n\n╰━━━━━━━━━━━━━━━", msg);
       
       db.setChatUser(chat, userId, 'coins', user.coins - bet);
-      global.db.games.tic[chat] = { type: "bot", player1: userId, bet: bet, board: Array(9).fill(null) };
-      return sock.sendMessage(chat, { text: "╭━━━〔 🤖 𝙋𝘼𝙍𝙏𝙄𝘿𝘼 𝙑𝙎 𝘽𝙊𝙏 〕━━━⬣\n\n¡La IA está lista para destruirte!\n*tic [1-9]* para mover.\n\n╰━━━━━━━━━━━━━━━" }, { quoted: msg });
+      const board = Array(9).fill(null);
+      global.db.games.tic[chat] = { type: "bot", player1: userId, bet: bet, board: board };
+      
+      return sock.sendMessage(chat, { text: `╭━━━〔 🤖 𝙋𝘼𝙍𝙏𝙄𝘿𝘼 𝙑𝙎 𝘽𝙊𝙏 〕━━━⬣\n\n¡La IA está lista!\nTablero inicial:\n${drawBoard(board)}\n\n*tic [1-9]* para mover.\n\n╰━━━━━━━━━━━━━━━` }, { quoted: msg });
     }
 
     // ⚔️ RETO CON APUESTA (PVP)
@@ -53,13 +58,12 @@ export default {
       const bet = parseInt(args[1]);
       if (isNaN(bet) || bet < 1) return sock.reply(chat, "╭━━━〔 ❌ 𝙀𝙍𝙍𝙊𝙍 〕━━━⬣\n\nEjemplo: *tic @usuario 100*\n\n╰━━━━━━━━━━━━━━━", msg);
       if ((user.coins || 0) < bet) return sock.reply(chat, "╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣", msg);
-
       const opponent = msg.mentionedJid[0];
       let op = db.getChatUser(chat, opponent);
       if (!op) { db.setChatUser(chat, opponent, 'coins', 0); op = db.getChatUser(chat, opponent); }
       if ((op.coins || 0) < bet) return sock.reply(chat, "╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣\n\nTu oponente no tiene suficientes digitales.\n\n╰━━━━━━━━━━━━━━━", msg);
 
-      global.db.games.tic[chat] = { type: "request", player1: userId, player2: opponent, bet: bet, board: Array(9).fill(null), turn: null };
+      global.db.games.tic[chat] = { type: "request", player1: userId, player2: opponent, bet: bet, board: Array(9).fill(null) };
       return sock.sendMessage(chat, { text: `╭━━━〔 ⚔️ 𝘿𝙀𝙎𝘼𝙁𝙄́𝙊 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n\n👤 @${userId.split('@')[0]} desafía a @${opponent.split('@')[0]} por *${bet} digitales*.\n\n🎮 Usa: *tic aceptar* o *tic rechazar*\n\n╰━━━━━━━━━━━━━━━`, mentions: [userId, opponent] }, { quoted: msg });
     }
 
@@ -98,19 +102,16 @@ export default {
       const prize = g.bet * 2;
       let uWin = db.getChatUser(chat, userId);
       db.setChatUser(chat, userId, 'coins', (uWin.coins || 0) + prize);
-
+      
       if (g.type === "game") {
         const loserId = userId === g.player1 ? g.player2 : g.player1;
         let uLose = db.getChatUser(chat, loserId);
-        
         const h1 = (uWin.achievements || []).some(a => a.id === "tic_streak_15");
         const h2 = (uWin.achievements || []).some(a => a.id === "tic_legend_100");
         const l1 = (uLose.achievements || []).some(a => a.id === "tic_streak_15");
-
         if (!l1) db.setChatUser(chat, loserId, 'ticStreak', 0);
         db.setChatUser(chat, userId, 'ticStreak', (uWin.ticStreak || 0) + 1);
         let newStreak = (uWin.ticStreak || 0) + 1;
-
         let msgLogro = "";
         if (newStreak === 15 && !h1) {
           let ach = uWin.achievements || [];
@@ -132,7 +133,7 @@ export default {
       }
     }
 
-    // 🤝 EMPATE
+    // ⚖️ EMPATE
     if (!board.includes(null)) {
       if (g.type === "game") {
         let p1 = db.getChatUser(chat, g.player1);
@@ -150,13 +151,11 @@ export default {
       board[botMove] = "⭕";
       if (checkWin(board, "⭕")) {
         delete global.db.games.tic[chat];
-        return sock.reply(chat, "╭━━━〔 🤖 𝘽𝙊𝙏 𝙒𝙄𝙉 〕━━━⬣\n\nEl bot te ha derrotado.\n\n╰━━━━━━━━━━━━━━━", msg);
+        return sock.reply(chat, `╭━━━〔 🤖 𝘽𝙊𝙏 𝙒𝙄𝙉 〕━━━⬣\n${drawBoard(board)}\n\nEl bot te ha derrotado.\n\n╰━━━━━━━━━━━━━━━`, msg);
       }
-    } else {
-      g.turn = g.turn === g.player1 ? g.player2 : g.player1;
-    }
+    } else { g.turn = g.turn === g.player1 ? g.player2 : g.player1; }
 
-    const draw = () => board.map((v, i) => v ? v : (i + 1) + "️⃣").join(" ");
-    sock.reply(chat, `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${board[0]} ${board[1]} ${board[2]}\n${board[3]} ${board[4]} ${board[5]}\n${board[6]} ${board[7]} ${board[8]}\n\n🎯 ${g.type === "bot" ? "Tu turno." : "Turno: <@" + g.turn.split('@')[0] + ">"}\n╰━━━━━━━━━━━━━━━`, msg);
+    sock.reply(chat, `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${drawBoard(board)}\n\n🎯 ${g.type === "bot" ? "Tu turno." : "Turno: <@" + g.turn.split('@')[0] + ">"}\n╰━━━━━━━━━━━━━━━`, msg);
   }
 };
+            
