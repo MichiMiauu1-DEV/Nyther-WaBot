@@ -28,17 +28,15 @@ export default {
 
     if (!global.db.games) global.db.games = {};
     if (!global.db.games.tic) global.db.games.tic = {};
+    if (!global.db.ticStreaks) global.db.ticStreaks = {}; // Almacenamiento en memoria para rachas
     const g = global.db.games.tic[chat];
 
     let user = db.getChatUser(chat, userId);
     if (!user) {
         db.setChatUser(chat, userId, 'coins', 0);
         db.setChatUser(chat, userId, 'achievements', []);
-        db.setChatUser(chat, userId, 'ticStreak', 0);
         user = db.getChatUser(chat, userId);
     }
-    // Asegurar que ticStreak exista en el objeto user local para evitar errores
-    if (user.ticStreak === undefined) user.ticStreak = 0;
 
     const normalize = (t) => (t || "").toLowerCase().trim();
 
@@ -108,23 +106,17 @@ export default {
     if (checkWin(board, symbol)) {
       const prize = g.bet * 2;
       let uWin = db.getChatUser(chat, userId);
-      // Validar streak del ganador antes de sumar
-      if (uWin.ticStreak === undefined) uWin.ticStreak = 0;
-      
       db.setChatUser(chat, userId, 'coins', (uWin.coins || 0) + prize);
       
       if (g.type === "game") {
         const loserId = userId === g.player1 ? g.player2 : g.player1;
-        let uLose = db.getChatUser(chat, loserId);
-        if (uLose && uLose.ticStreak === undefined) uLose.ticStreak = 0;
+        global.db.ticStreaks[loserId] = 0; // Reset racha perdedor
+        global.db.ticStreaks[userId] = (global.db.ticStreaks[userId] || 0) + 1; // Incremento memoria
         
+        let newStreak = global.db.ticStreaks[userId];
         const h1 = (uWin.achievements || []).some(a => a.id === "tic_streak_15");
         const h2 = (uWin.achievements || []).some(a => a.id === "tic_legend_100");
-        const l1 = (uLose.achievements || []).some(a => a.id === "tic_streak_15");
         
-        if (!l1) db.setChatUser(chat, loserId, 'ticStreak', 0);
-        db.setChatUser(chat, userId, 'ticStreak', (uWin.ticStreak || 0) + 1);
-        let newStreak = (uWin.ticStreak || 0) + 1;
         let msgLogro = "";
         if (newStreak === 15 && !h1) {
           let ach = uWin.achievements || [];
@@ -132,14 +124,14 @@ export default {
           db.setChatUser(chat, userId, 'achievements', ach);
           msgLogro += "\n\n🏆 *¡LOGRO DESBLOQUEADO: DOMINIO MENTAL!* 🏆";
         }
-        if (newStreak === 100 && h1 && !h2) {
+        if (newStreak === 100 && !h2) {
           let ach = uWin.achievements || [];
           ach.push({ id: "tic_legend_100", name: "👑 Leyenda del Tablero", emoji: "👑", description: "100 victorias totales" });
           db.setChatUser(chat, userId, 'achievements', ach);
           msgLogro += "\n\n👑 *¡LOGRO DESBLOQUEADO: LEYENDA DEL TABLERO!* 👑";
         }
         delete global.db.games.tic[chat];
-        return sock.sendMessage(chat, { text: `╭━━━〔 🏆 𝙂𝘼𝙉𝘼𝘿𝙊𝙍 〕━━━⬣\n\n🎉 <@${userId.split('@')[0]}> ganó *${prize} digitales*!\n${h1 ? "📊 Victorias totales: " : "🔥 Racha actual: "} *${newStreak}*${msgLogro}\n\n╰━━━━━━━━━━━━━━━`, mentions: [userId] }, { quoted: msg });
+        return sock.sendMessage(chat, { text: `╭━━━〔 🏆 𝙂𝘼𝙉𝘼𝘿𝙊𝙍 〕━━━⬣\n\n🎉 <@${userId.split('@')[0]}> ganó *${prize} digitales*!\n🔥 Racha actual: *${newStreak}*${msgLogro}\n\n╰━━━━━━━━━━━━━━━`, mentions: [userId] }, { quoted: msg });
       } else {
         delete global.db.games.tic[chat];
         return sock.reply(chat, "╭━━━〔 🏆 𝙂𝘼𝙉𝘼𝘿𝙊𝙍 〕━━━⬣\n\n¡IMPOSIBLE! Has vencido al bot.\n\n╰━━━━━━━━━━━━━━━", msg);
@@ -172,4 +164,4 @@ export default {
     sock.sendMessage(chat, { text: `╭━━━〔 🎮 𝙏𝙄𝘾 𝙏𝘼𝘾 𝙏𝙊𝙀 〕━━━⬣\n${drawBoard(board)}\n\n🎯 Turno: @${g.turn.split('@')[0]} (${nextSymbol})\n╰━━━━━━━━━━━━━━━`, mentions: [g.turn] }, { quoted: msg });
   }
 };
-                       
+        
