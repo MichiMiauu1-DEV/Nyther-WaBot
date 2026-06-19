@@ -3,22 +3,21 @@ import os from 'os';
 export default {
   command: ['ping', 'p'],
   category: 'info',
-  run: async (client, m) => {
-    // Si m es undefined o no tiene chat, intentamos recuperarlo del objeto
-    if (!m) return;
-    const chatId = m.chat || m.key?.remoteJid;
-    if (!chatId) return;
-
+  run: async ({ msg, sock }) => { // Ajustado para recibir el objeto desestructurado tal como en main.js
     const start = Date.now();
-    const botId = client.user?.id?.split(':')[0] + "@s.whatsapp.net";
+    
+    // Obtener ID del bot de forma segura usando sock
+    const botId = sock.user?.id?.split(':')[0] + "@s.whatsapp.net";
     const nameBot = global.db?.data?.settings?.[botId]?.namebot || 'Bot';
     
-    const sent = await client.sendMessage(chatId, { 
+    // Enviamos el mensaje inicial
+    const sent = await sock.sendMessage(msg.chat, { 
         text: '《✧》 Calculando...' 
-    }, { quoted: m });
+    }, { quoted: msg });
     
     const latency = Date.now() - start;
     
+    // Información del sistema
     const cpus = os.cpus();
     const cpuModel = cpus.length > 0 ? cpus[0].model.trim() : 'Desconocido';
     const cpuSpeed = cpus.length > 0 ? cpus[0].speed : '0';
@@ -33,7 +32,8 @@ export default {
     const minutes = Math.floor((uptime % (60 * 60)) / 60);
     const seconds = Math.floor(uptime % 60);
 
-    await client.sendMessage(chatId, { 
+    // Edición del mensaje
+    await sock.sendMessage(msg.chat, { 
       text: `《✧》 ${nameBot}\n\n` +
             `» Speed : ${latency} ms\n` +
             `» Processor : ${cpuModel}\n` +
@@ -41,6 +41,6 @@ export default {
             `» RAM : ${usedRamMB} MB / ${totalRamGB} GB\n` +
             `» Active time : ${days}d ${hours}h ${minutes}m ${seconds}s`, 
       edit: sent.key 
-    }, { quoted: m });
+    }, { quoted: msg });
   },
 };
