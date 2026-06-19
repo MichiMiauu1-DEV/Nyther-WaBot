@@ -11,7 +11,7 @@ export default {
     const namebot = global.db?.data?.settings?.[botJid]?.namebot || 'Bot';
 
     const sent = await sock.sendMessage(msg.chat, { 
-        text: '`❏ ¡Pong!`' + `\n> *${namebot}*` 
+        text: '`❏ ¡Pong!`' + `\n> *Caine*` 
     }, { quoted: msg });
     
     const latency = Date.now() - start;
