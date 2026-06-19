@@ -4,7 +4,7 @@ export default {
   command: ['givecoins', 'pay', 'coinsgive'],
   category: 'economy',
   description: 'Transfiere tus riquezas a otro acróbata del Circo.',
-  run: async ({ msg, sock, args, usedPrefix, command, text }) => {
+  run: async ({ msg, sock, args, usedPrefix, command }) => {
     const chatId = msg.chat;
     const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     const botSettings = db.getSettings(botId);
@@ -30,7 +30,7 @@ Dile a tu administrador que encienda los motores de la diversión con el comando
 
 Debes mencionar al acróbata al que deseas transferir *${monedas}*.
 
-> Ejemplo ➜ *${usedPrefix + command} 25000 @mencion*
+> Ejemplo ➜ *${usedPrefix + command} 25k @mencion*
 
 ╰━━━━━━━━━━━━━━━`);
     }
@@ -46,20 +46,38 @@ El usuario mencionado no está registrado en los archivos del Circo.
 ╰━━━━━━━━━━━━━━━`);
     }
     
-    // Validación de cantidad
+    // Validación de cantidad inteligente
     const cantidadInput = args[0]?.toLowerCase();
-    let cantidad = cantidadInput === 'all' ? (senderData.bank || 0) : parseInt(cantidadInput);
+    let cantidad = 0;
+
+    if (cantidadInput === 'all') {
+        cantidad = (senderData.bank || 0);
+    } else if (cantidadInput) {
+        const cleanInput = cantidadInput.replace(/\s+/g, '');
+        const match = cleanInput.match(/^([\d.]+)([km]?)$/);
+        
+        if (match) {
+            let numero = parseFloat(match[1]);
+            let multiplicador = match[2];
+            
+            if (multiplicador === 'k') numero *= 1000;
+            if (multiplicador === 'm') numero *= 1000000;
+            
+            cantidad = Math.floor(numero);
+        }
+    }
     
     if (!cantidadInput || isNaN(cantidad) || cantidad <= 0) {
       return msg.reply(`╭━━━〔 🛑 𝘾𝘼𝙉𝙏𝙄𝘿𝘼𝘿 𝙄𝙇𝙀𝙂𝘼𝙇 〕━━━⬣
 
-Ingresa una cifra válida de *${monedas}* para transferir.
+Ingresa una cifra válida de *${monedas}*.
+Ejemplos: *1000, 10k, 1.5k, 2M*
 
 ╰━━━━━━━━━━━━━━━`);
     }
     
     if ((senderData.bank || 0) < cantidad) {
-      return msg.reply(`╭━━━〔 💸 𝙁𝙊𝙉调𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
+      return msg.reply(`╭━━━〔 💸 𝙁𝙊𝙉𝘿𝙊𝙎 𝙄𝙉𝙎𝙐𝙁𝙄𝘾𝙄𝙀𝙉𝙏𝙀𝙎 〕━━━⬣
 
 Tu banco está más vacío que una carpa sin show.
 
