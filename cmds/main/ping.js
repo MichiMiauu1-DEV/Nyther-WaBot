@@ -1,11 +1,44 @@
-import db from '#db';
+import os from 'os';
+
 export default {
   command: ['ping', 'p'],
-  category: 'main',
-  run: async ({ msg, sock }) => {
-    const start = Date.now()
-    const sent = await sock.sendMessage(msg.chat, { text: '`❏ ¡Pong!`' + `\n> *${db.getSettings(sock.user.id.split(':')[0] + "@s.whatsapp.net").namebot}*`}, { quoted: msg })
-    const latency = Date.now() - start
-    await sock.sendMessage(msg.chat, { text: `✿ *Pong!*\n> Tiempo ⴵ ${latency.toFixed(4).split(".")[0]}ms`, edit: sent.key }, { quoted: msg })
+  category: 'info',
+  run: async (client, m) => {
+    const start = Date.now();
+    const botId = client.user.id.split(':')[0] + "@s.whatsapp.net";
+    const nameBot = global.db.data.settings[botId]?.namebot || 'Bot';
+    
+    const sent = await client.sendMessage(m.chat, { 
+        text: '《✧》 Calculando...' 
+    }, { quoted: m });
+    
+    const latency = Date.now() - start;
+    
+    // Obtener información del sistema
+    const cpus = os.cpus();
+    const cpuModel = cpus.length > 0 ? cpus[0].model.trim() : 'Desconocido';
+    const cpuSpeed = cpus.length > 0 ? cpus[0].speed : '0';
+    const cpuCores = cpus.length;
+
+    // Calcular RAM
+    const totalRamGB = (os.totalmem() / (1024 * 1024 * 1024)).toFixed(1);
+    const usedRamMB = (process.memoryUsage().rss / (1024 * 1024)).toFixed(2);
+
+    // Calcular Uptime
+    const uptime = process.uptime();
+    const days = Math.floor(uptime / (60 * 60 * 24));
+    const hours = Math.floor((uptime % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((uptime % (60 * 60)) / 60);
+    const seconds = Math.floor(uptime % 60);
+
+    await client.sendMessage(m.chat, { 
+      text: `《✧》 ${nameBot}\n\n` +
+            `» Speed : ${latency} ms\n` +
+            `» Processor : ${cpuModel}\n` +
+            `» CPU : ${cpuSpeed} MHz (${cpuCores} nucleos)\n` +
+            `» RAM : ${usedRamMB} MB / ${totalRamGB} GB\n` +
+            `» Active time : ${days}d ${hours}h ${minutes}m ${seconds}s`, 
+      edit: sent.key 
+    }, { quoted: m });
   },
 };
