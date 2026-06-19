@@ -87,12 +87,12 @@ export const defChat = {
   sWelcome: '',
   sGoodbye: '',
   nsfw: 0,
-  alerts: 1,
-  gacha: 1,
-  economy: 1,
+  alerts: 0,
+  gacha: 0,
+  economy: 0,
   adminonly: 0,
   primaryBot: null,
-  antilinks: 1,
+  antilinks: 0,
   antistatus: 0,
   rolls: '{}'
 };
@@ -112,7 +112,7 @@ export const defChatUser = {
 };
 
 export const defSets = {
-  self: 0,
+  self: 1,
   prefix: '["*"]',
   commandsejecut: 0,
   newsletter_id: '120363427108760056@newsletter',
