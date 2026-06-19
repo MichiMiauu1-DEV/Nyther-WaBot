@@ -5,8 +5,10 @@ export default {
   category: 'info',
   run: async (client, m) => {
     const start = Date.now();
-    const botId = client.user.id.split(':')[0] + "@s.whatsapp.net";
-    const nameBot = global.db.data.settings[botId]?.namebot || 'Bot';
+    
+    // VERIFICACIÓN DE SEGURIDAD PARA EL ID DEL BOT
+    const botId = client.user?.id?.split(':')[0] + "@s.whatsapp.net" || "Desconocido";
+    const nameBot = global.db?.data?.settings?.[botId]?.namebot || 'Bot';
     
     const sent = await client.sendMessage(m.chat, { 
         text: '《✧》 Calculando...' 
@@ -14,17 +16,14 @@ export default {
     
     const latency = Date.now() - start;
     
-    // Obtener información del sistema
     const cpus = os.cpus();
     const cpuModel = cpus.length > 0 ? cpus[0].model.trim() : 'Desconocido';
     const cpuSpeed = cpus.length > 0 ? cpus[0].speed : '0';
     const cpuCores = cpus.length;
 
-    // Calcular RAM
     const totalRamGB = (os.totalmem() / (1024 * 1024 * 1024)).toFixed(1);
     const usedRamMB = (process.memoryUsage().rss / (1024 * 1024)).toFixed(2);
 
-    // Calcular Uptime
     const uptime = process.uptime();
     const days = Math.floor(uptime / (60 * 60 * 24));
     const hours = Math.floor((uptime % (60 * 60 * 24)) / (60 * 60));
