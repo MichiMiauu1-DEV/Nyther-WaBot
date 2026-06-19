@@ -4,13 +4,16 @@ export default {
   command: ['ping', 'p'],
   category: 'info',
   run: async (client, m) => {
+    // Si m es undefined o no tiene chat, intentamos recuperarlo del objeto
+    if (!m) return;
+    const chatId = m.chat || m.key?.remoteJid;
+    if (!chatId) return;
+
     const start = Date.now();
-    
-    // VERIFICACIÓN DE SEGURIDAD PARA EL ID DEL BOT
-    const botId = client.user?.id?.split(':')[0] + "@s.whatsapp.net" || "Desconocido";
+    const botId = client.user?.id?.split(':')[0] + "@s.whatsapp.net";
     const nameBot = global.db?.data?.settings?.[botId]?.namebot || 'Bot';
     
-    const sent = await client.sendMessage(m.chat, { 
+    const sent = await client.sendMessage(chatId, { 
         text: '《✧》 Calculando...' 
     }, { quoted: m });
     
@@ -30,7 +33,7 @@ export default {
     const minutes = Math.floor((uptime % (60 * 60)) / 60);
     const seconds = Math.floor(uptime % 60);
 
-    await client.sendMessage(m.chat, { 
+    await client.sendMessage(chatId, { 
       text: `《✧》 ${nameBot}\n\n` +
             `» Speed : ${latency} ms\n` +
             `» Processor : ${cpuModel}\n` +
