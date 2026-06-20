@@ -49,21 +49,3 @@ export default {
     await sock.sendMessage(chatId, { text: bal }, { quoted: msg });
   }
 };
-    const users = db.getUser(who);
-    const total = (user.coins || 0) + (user.bank || 0);
-
-    const bal = `╭━━━〔 🎪 𝙀𝙎𝙏𝘼𝘿𝙊 𝘿𝙀 𝘾𝙐𝙀𝙉𝙏𝘼 〕━━━⬣
-
-» Habitante ➜ *${users?.name || who.split('@')[0]}*
-
-🪙 Cartera Virtual ➜ *¥${user.coins?.toLocaleString() || 0} ${monedas}*
-🏦 Bóveda del Circo ➜ *¥${user.bank?.toLocaleString() || 0} ${monedas}*
-💎 Activos Totales ➜ *¥${total.toLocaleString()} ${monedas}*
-
-╰━━━━━━━━━━━━━━━
-
-> 🛅 ¡Protege tus fondos de los glitches usando el comando *${usedPrefix}deposit*!`;
-
-    await sock.sendMessage(chatId, { text: bal }, { quoted: msg });
-  }
-};
