@@ -8,14 +8,16 @@ import chalk from "chalk";
 import cfonts from "cfonts";
 import fs from "fs";
 import path from "path";
-import express from "express"; // Servidor web para Render
+import express from "express";
 import { smsg, getCachedMeta, setCachedMeta } from "#serialize";
 import cmdsLoader from '#system/cmdsLoader';
 import "#system/database";
 import { startSubBot } from './cmds/socket/subs.js';
 import db from '#db';
 
-// Servidor Express para evitar el timeout de Render
+// -------------------------------------------------------------------
+// 1. Servidor HTTP Express (Evita el error de puerto y timeout de Render)
+// -------------------------------------------------------------------
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,6 +29,9 @@ app.listen(PORT, () => {
   console.log(chalk.green.bold(`[ ✿ ] Servidor Web iniciado en el puerto: ${PORT}`));
 });
 
+// -------------------------------------------------------------------
+// 2. Logs y utilidades de teléfono
+// -------------------------------------------------------------------
 const log = {
   info: (msg) => console.log(chalk.bgBlue.white.bold(`INFO`), chalk.white(msg)),
   success: (msg) => console.log(chalk.bgGreen.white.bold(`SUCCESS`), chalk.greenBright(msg)),
@@ -44,15 +49,14 @@ function normalizePhone(input) {
   return s;
 }
 
-// Configuración de número y método para Render
-// Define la variable de entorno NUMERO_BOT en Render (Ej: 573010000000)
+// Configuración del número (Configurar NUMERO_BOT en las Variables de Entorno de Render)
 let phoneInput = process.env.NUMERO_BOT || "573000000000"; 
 let phoneNumber = normalizePhone(phoneInput);
 
 const methodCodeQR = process.argv.includes("--qr");
 const methodCode = process.argv.includes("code");
 
-// Si se especifica --qr usará QR, de lo contrario usará Código de 8 dígitos (Opción 2)
+// Por defecto usa código de 8 dígitos (2), salvo que se pase la flag --qr
 let opcion = methodCodeQR ? "1" : "2";
 
 const { say } = cfonts;
@@ -70,6 +74,7 @@ say('Made with love by MichiMiauOFC for Chris.', {
 const botTypes = [
   { name: 'SubBot', folder: './Sessions/Subs', starter: startSubBot },
 ];
+
 if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp', { recursive: true });
 global.conns = global.conns || [];
 const reconnecting = new Set();
@@ -163,6 +168,9 @@ async function warmupGroups(sock) {
   }
 }
 
+// -------------------------------------------------------------------
+// 3. Función principal de inicio del Bot
+// -------------------------------------------------------------------
 export async function startBot() {
   if (isRestarting) return;
   isRestarting = true;
@@ -198,7 +206,7 @@ export async function startBot() {
     return jid;
   };
 
-  // Solicitar código de vinculación de 8 dígitos si no está registrado
+  // Solicitar código de vinculación de 8 dígitos si no hay sesión iniciada
   if (opcion === "2" && !state.creds.registered) {
     setTimeout(async () => {
       try {
@@ -214,8 +222,8 @@ export async function startBot() {
     }, 3000);
   }
 
+  // Escuchar mensajes e intentar ejecutarlos
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
-    if (!botReady) return;
     if (type !== 'notify') return;
     for (const msg of messages) {
       if (msg?.message && msg?.key?.id) {
@@ -227,10 +235,15 @@ export async function startBot() {
         if (!msg?.message || msg.key?.remoteJid === "status@broadcast") continue;
         if ((msg.messageTimestamp * 1000) < bootTime - 15_000) continue;
         if (msg.message.ephemeralMessage) msg.message = msg.message.ephemeralMessage.message;
+        
         const m = await smsg(sock, msg);
-        if (typeof main === 'function') main(sock, m, messages).catch((err) => console.error('[ ✿  ]  Main Owner »', err?.message));
+        if (typeof main === 'function') {
+          main(sock, m, messages).catch((err) => {
+            console.error(chalk.red('[ ✿ ERROR EN MAIN ] »'), err);
+          });
+        }
       } catch (err) {
-        console.error('Error:', err);
+        console.error(chalk.red('Error al procesar mensaje:'), err);
       }
     }
   });
@@ -248,36 +261,35 @@ export async function startBot() {
       bootTime = Date.now();
       reconexion = 0;
       isRestarting = false;
+      botReady = true;
       const userName = sock.user.name || "Desconocido";
-      log.success(`[ ✿ ]  Conectado a: ${userName}`);
-      if (!botReady) {
-        botReady = true;
-        warmupGroups(sock);
-      }
+      log.success(`[ ✿ ] Conectado con éxito a: ${userName}`);
+      warmupGroups(sock);
     }
+    
     if (isNewLogin) log.info("Nuevo dispositivo detectado");
     if (receivedPendingNotifications === true) {
       log.warn("Por favor espere aproximadamente 1 minuto...");
       sock.ev.flush();
     }
+    
     if (connection === "close") {
       const reason = lastDisconnect?.error?.output?.statusCode || 0;
+      botReady = false;
       if ([DisconnectReason.loggedOut, DisconnectReason.forbidden, DisconnectReason.multideviceMismatch].includes(reason)) {
         log.warn(`Principal desvinculado (${reason}) — limpiando sesión y reiniciando...`);
-        botReady = false;
         isRestarting = false;
         clearSession();
         process.exit(1);
       }
       if (reason === DisconnectReason.connectionReplaced) {
-        log.warn("Conexión reemplazada — cerrá la otra sesión antes de reconectar.");
+        log.warn("Conexión reemplazada — cierra la otra sesión antes de reconectar.");
         isRestarting = false;
         return;
       }
       reconexion++;
       if (reconexion > retriesLimit) {
         log.error(`Demasiados reintentos (${retriesLimit}) — sesión posiblemente corrupta, limpiando...`);
-        botReady = false;
         reconexion = 0;
         isRestarting = false;
         clearSession();
