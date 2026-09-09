@@ -8,12 +8,24 @@ import chalk from "chalk";
 import cfonts from "cfonts";
 import fs from "fs";
 import path from "path";
-import readlineSync from "readline-sync";
+import express from "express"; // Servidor web para Render
 import { smsg, getCachedMeta, setCachedMeta } from "#serialize";
 import cmdsLoader from '#system/cmdsLoader';
 import "#system/database";
 import { startSubBot } from './cmds/socket/subs.js';
 import db from '#db';
+
+// Servidor Express para evitar el timeout de Render
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Bot de WhatsApp activo en Render 🤖');
+});
+
+app.listen(PORT, () => {
+  console.log(chalk.green.bold(`[ ✿ ] Servidor Web iniciado en el puerto: ${PORT}`));
+});
 
 const log = {
   info: (msg) => console.log(chalk.bgBlue.white.bold(`INFO`), chalk.white(msg)),
@@ -22,10 +34,6 @@ const log = {
   error: (msg) => console.log(chalk.bgRed.white.bold(`ERROR`), chalk.redBright(msg))
 };
 
-let phoneNumber = "";
-let phoneInput = "";
-const methodCodeQR = process.argv.includes("--qr");
-const methodCode = process.argv.includes("code");
 function normalizePhone(input) {
   let s = String(input).replace(/\D/g, '');
   if (!s) return '';
@@ -36,17 +44,28 @@ function normalizePhone(input) {
   return s;
 }
 
-const { say } = cfonts
-console.log(chalk.magentaBright('\n❀ Iniciando...'))
-  say('Nyther.', {
-  align: 'center',           
+// Configuración de número y método para Render
+// Define la variable de entorno NUMERO_BOT en Render (Ej: 573010000000)
+let phoneInput = process.env.NUMERO_BOT || "573000000000"; 
+let phoneNumber = normalizePhone(phoneInput);
+
+const methodCodeQR = process.argv.includes("--qr");
+const methodCode = process.argv.includes("code");
+
+// Si se especifica --qr usará QR, de lo contrario usará Código de 8 dígitos (Opción 2)
+let opcion = methodCodeQR ? "1" : "2";
+
+const { say } = cfonts;
+console.log(chalk.magentaBright('\n❀ Iniciando...'));
+say('Nyther.', {
+  align: 'center',            
   gradient: ['red', 'blue'] 
-})
-  say('Made with love by MichiMiauOFC for Chris.', {
+});
+say('Made with love by MichiMiauOFC for Chris.', {
   font: 'console',
   align: 'center',
   gradient: ['blue', 'magenta']
-})
+});
 
 const botTypes = [
   { name: 'SubBot', folder: './Sessions/Subs', starter: startSubBot },
@@ -115,52 +134,32 @@ function clearSession() {
   }
 }
 
-let opcion;
-if (methodCodeQR) {
-  opcion = "1";
-} else if (methodCode) {
-  opcion = "2";
-  if (!phoneNumber) {
-    console.log(chalk.bold.redBright(`\nPor favor, Ingrese el número de WhatsApp.\n${chalk.bold.yellowBright("Ejemplo: +57301******")}\n${chalk.bold.magentaBright('---> ')}`));
-    phoneInput = readlineSync.question("");
-    phoneNumber = normalizePhone(phoneInput);
-  }
-} else if (!fs.existsSync("./Sessions/Owner/creds.json")) {
-  opcion = readlineSync.question(chalk.bold.white("\nSeleccione una opción:\n") + chalk.blueBright("1. Con código QR\n") + chalk.cyan("2. Con código de texto de 8 dígitos\n--> "));
-  while (!/^[1-2]$/.test(opcion)) {
-    console.log(chalk.bold.redBright(`No se permiten numeros que no sean 1 o 2, tampoco letras o símbolos especiales.`));
-    opcion = readlineSync.question("--> ");
-  }
-  if (opcion === "2") {
-    console.log(chalk.bold.redBright(`\nPor favor, Ingrese el número de WhatsApp.\n${chalk.bold.yellowBright("Ejemplo: +57301******")}\n${chalk.bold.magentaBright('---> ')}`));
-    phoneInput = readlineSync.question("");
-    phoneNumber = normalizePhone(phoneInput);
-  }
-}
-
 let bootTime = Date.now();
 let reconexion = 0;
 let botReady = false;
 let isRestarting = false;
 const retriesLimit = 15;
+
 async function warmupGroups(sock) {
   try {
-    const allChats = db.getChat()
-    const chatIds = allChats.map(c => c.id).filter(id => typeof id === 'string' && id.endsWith('@g.us')).slice(0, 50)
-    if (!chatIds.length) return
-    console.log(chalk.gray(`[ ✿ ] Precargando metadata de ${chatIds.length} grupos...`))
-    const t = Date.now()
-    const batches = []
+    const allChats = db.getChat();
+    const chatIds = allChats.map(c => c.id).filter(id => typeof id === 'string' && id.endsWith('@g.us')).slice(0, 50);
+    if (!chatIds.length) return;
+    console.log(chalk.gray(`[ ✿ ] Precargando metadata de ${chatIds.length} grupos...`));
+    const t = Date.now();
+    const batches = [];
     for (let i = 0; i < chatIds.length; i += 10) {
-      batches.push(chatIds.slice(i, i + 10))
+      batches.push(chatIds.slice(i, i + 10));
     }
     await Promise.allSettled(batches.map(batch => Promise.allSettled(batch.map(async id => {
-    try {
-    const meta = await sock.groupMetadata(id)
-    if (meta) setCachedMeta(id, meta) } catch {}}))))
-    console.log(chalk.gray(`[ ✿ ] Warmup completado en ${Date.now() - t}ms`))
+      try {
+        const meta = await sock.groupMetadata(id);
+        if (meta) setCachedMeta(id, meta);
+      } catch {}
+    }))));
+    console.log(chalk.gray(`[ ✿ ] Warmup completado en ${Date.now() - t}ms`));
   } catch (e) {
-    console.log(chalk.gray(`[ ✿ ] warmupGroups → ${e?.message || e}`))
+    console.log(chalk.gray(`[ ✿ ] warmupGroups → ${e?.message || e}`));
   }
 }
 
@@ -172,6 +171,7 @@ export async function startBot() {
   const { version } = await fetchLatestBaileysVersion();
   console.info = () => {};
   console.debug = () => {};
+  
   const sock = makeWASocket({
     version,
     logger: pino({ level: 'silent' }),
@@ -198,16 +198,18 @@ export async function startBot() {
     return jid;
   };
 
+  // Solicitar código de vinculación de 8 dígitos si no está registrado
   if (opcion === "2" && !state.creds.registered) {
     setTimeout(async () => {
       try {
         if (!state.creds.registered) {
+          console.log(chalk.cyan(`[ ✿ ] Solicitando código para el número: ${phoneNumber}`));
           const pairing = await sock.requestPairingCode(phoneNumber);
           const codeBot = pairing?.match(/.{1,4}/g)?.join("-") || pairing;
-          console.log(chalk.bold.white(chalk.bgMagenta(`Código de emparejamiento:`)), chalk.bold.white(chalk.white(codeBot)));
+          console.log(chalk.bold.white(chalk.bgMagenta(`\n\n=== CÓDIGO DE EMPAREJAMIENTO ===`)), chalk.bold.yellow(`\n\n -> ${codeBot} <-\n\n`));
         }
       } catch (err) {
-        console.log(chalk.red("Error al generar código:"), err);
+        console.log(chalk.red("Error al generar código de emparejamiento:"), err);
       }
     }, 3000);
   }
@@ -237,12 +239,11 @@ export async function startBot() {
 
   sock.ev.on("connection.update", async (update) => {
     const { qr, connection, lastDisconnect, isNewLogin, receivedPendingNotifications } = update;
-    if (qr != 0 && qr != undefined || methodCodeQR) {
-      if (opcion == '1' || methodCodeQR) {
-        console.log(chalk.green.bold("[ ✿ ] Escanea este código QR"));
-        qrcode.generate(qr, { small: true });
-      }
+    if (qr != 0 && qr != undefined && opcion === '1') {
+      console.log(chalk.green.bold("[ ✿ ] Escanea este código QR"));
+      qrcode.generate(qr, { small: true });
     }
+    
     if (connection === "open") {
       bootTime = Date.now();
       reconexion = 0;
